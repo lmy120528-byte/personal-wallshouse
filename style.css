@@ -1,0 +1,254 @@
+/* ===== 基础设置 ===== */
+/* 这些是全局样式，影响整个页面 */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #f8f9fa;
+    color: #2d3436;
+    line-height: 1.6;
+}
+
+/* ===== 导航栏 ===== */
+nav {
+    padding: 20px 40px;
+    background: white;
+    border-bottom: 1px solid #eee;
+}
+
+.nav-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* ===== 头部个人信息 ===== */
+header {
+    text-align: center;
+    padding: 80px 20px 60px;
+    background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+    background-image: url('images/背景图修改.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+/* 背景图上的暗色遮罩，让文字更清晰 */
+header::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 0;
+}
+
+header > * {
+    position: relative;
+    z-index: 1;
+}
+
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto 20px;
+}
+
+header h1 {
+    font-size: 36px;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+header .title {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 8px;
+}
+
+header .tagline {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* ===== 内容区块通用样式 ===== */
+section {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 60px 20px;
+}
+
+section h2 {
+    font-size: 22px;
+    margin-bottom: 24px;
+    position: relative;
+    padding-left: 16px;
+}
+
+/* h2 左边的小蓝条装饰 */
+section h2::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 4px;
+    width: 4px;
+    height: 20px;
+    background: #0984e3;
+    border-radius: 2px;
+}
+
+/* ===== 关于我 ===== */
+.about p {
+    font-size: 15px;
+    color: #636e72;
+    line-height: 1.8;
+}
+
+/* ===== 技能标签 ===== */
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tags span {
+    background: white;
+    border: 1px solid #dfe6e9;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 14px;
+    color: #2d3436;
+    transition: all 0.2s ease;
+}
+
+.tags span:hover {
+    border-color: #0984e3;
+    color: #0984e3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(9, 132, 227, 0.1);
+}
+
+/* ===== 社交媒体卡片 ===== */
+.social-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* 每个社交账号的卡片 */
+.social-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 20px 24px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+}
+
+.social-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.social-icon {
+    font-size: 32px;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.social-info strong {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.social-info span {
+    display: block;
+    font-size: 13px;
+    color: #b2bec3;
+}
+
+.social-desc {
+    margin-top: 2px;
+}
+
+/* ===== 微信公众号卡片（带二维码） ===== */
+.wechat-card {
+    cursor: default;
+}
+
+.qrcode-wrapper {
+    margin-left: auto;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.qrcode {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    background: #f8f9fa;
+    display: block;
+}
+
+.qrcode-hint {
+    display: block;
+    font-size: 11px;
+    color: #b2bec3;
+    margin-top: 4px;
+}
+
+/* ===== 联系方式 ===== */
+.contact {
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 1px solid #eee;
+}
+
+.contact h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.contact p {
+    font-size: 14px;
+    color: #636e72;
+}
+
+.contact a {
+    color: #0984e3;
+    text-decoration: none;
+}
+
+.contact a:hover {
+    text-decoration: underline;
+}
+
+/* ===== 底部 ===== */
+footer {
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid #eee;
+    color: #b2bec3;
+    font-size: 14px;
+}

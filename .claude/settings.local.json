@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -m http.server 8080)",
+      "Bash(open http://localhost:8080)",
+      "Bash(sips -g pixelWidth -g pixelHeight \"/Users/zhangqiang/personal-site/images/生成都市夜景图.png\")",
+      "Bash(git --version)",
+      "Bash(git config *)"
+    ]
+  }
+}
