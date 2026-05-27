@@ -3,87 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>张强 - GEO产品经理</title>
+    <title>张强 - AI 时代的产品 Builder 与翻译官</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- 顶部导航 -->
+    <!-- 导航栏 -->
     <nav>
-        <img src="images/avatar.png" alt="张强" class="nav-avatar">
+        <div class="nav-left">
+            <img src="images/avatar.png" alt="张强" class="nav-icon">
+            <span class="nav-brand">Product Builder</span>
+        </div>
+        <div class="nav-right">
+            <a href="#about">关于</a>
+            <a href="projects.html">项目经历</a>
+            <a href="articles.html">文章</a>
+            <a href="#contact">联系</a>
+        </div>
     </nav>
 
-    <!-- 个人头部信息 -->
-    <header>
-        <img src="images/avatar.png" alt="张强头像" class="avatar">
-        <h1>张强</h1>
-        <p class="title">GEO产品经理 · 前百度高级产品经理</p>
-        <p class="tagline">探索 AI 与产品的交汇点，记录学习与思考</p>
-    </header>
-
-    <!-- 关于我 -->
-    <section class="about">
-        <h2>关于我</h2>
-        <p>
-            前百度高级产品经理，现专注于 GEO（生成式引擎优化）方向。
-            相信 AI 会重塑产品经理的工作方式，正在学习用代码和 AI 工具把想法变成产品。
-            工作之余在社交媒体上分享 AI 学习心得，记录从产品视角理解技术的全过程。
-        </p>
-    </section>
-
-    <!-- 技能标签 -->
-    <section class="skills">
-        <h2>技能 & 关注方向</h2>
-        <div class="tags">
-            <span>产品设计</span>
-            <span>GEO</span>
-            <span>用户研究</span>
-            <span>数据分析</span>
-            <span>AI 产品</span>
-            <span>内容创作</span>
-            <span>Vibe Coding</span>
-            <span>SEO/AEO</span>
+    <!-- ① 首屏 Hero -->
+    <section class="hero">
+        <canvas id="heroBg"></canvas>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-title-wrap">
+                <p class="hero-line hero-line-1">AI 时代的产品</p>
+                <p class="hero-line hero-line-2">Builder 与翻译官</p>
+            </div>
+            <div class="hero-subtitle" id="heroSubtitle"></div>
+        </div>
+        <div class="scroll-indicator">
+            <span class="scroll-arrow">↓</span>
         </div>
     </section>
 
-    <!-- 社交媒体 -->
-    <section class="social">
-        <h2>在哪里找到我</h2>
-
-        <div class="social-cards">
-            <!-- 小红书 -->
-            <a href="https://www.xiaohongshu.com/user/profile/186460695" target="_blank" class="social-card">
-                <div class="social-icon">📕</div>
-                <div class="social-info">
-                    <strong>小红书 · 同路人</strong>
-                    <span>小红书号：186460695</span>
-                    <span class="social-desc">分享 AI 学习心得与产品思考</span>
-                </div>
-            </a>
-
-            <!-- 微信公众号 -->
-            <div class="social-card wechat-card">
-                <div class="social-icon">💬</div>
-                <div class="social-info">
-                    <strong>微信公众号 · 四方屋</strong>
-                    <span class="social-desc">AI 产品观察与深度长文</span>
-                </div>
-                <div class="qrcode-wrapper">
-                    <img src="images/维系公众号二维码.jpg" alt="四方屋公众号二维码" class="qrcode">
-                    <span class="qrcode-hint">扫码关注</span>
+    <!-- ② 关于 -->
+    <section id="about" class="section">
+        <div class="section-label">ABOUT</div>
+        <h2>关于我</h2>
+        <div class="about-grid">
+            <div class="about-intro">
+                <h3>个人介绍</h3>
+                <p>占位内容 —— 这里将放个人介绍文案。</p>
+            </div>
+            <div class="about-capabilities">
+                <h3>能力模型</h3>
+                <div class="capability-cards">
+                    <div class="cap-card">
+                        <div class="cap-icon">📋</div>
+                        <h4>产品经理</h4>
+                        <p>占位描述</p>
+                    </div>
+                    <div class="cap-card">
+                        <div class="cap-icon">🔍</div>
+                        <h4>GEO</h4>
+                        <p>占位描述</p>
+                    </div>
+                    <div class="cap-card">
+                        <div class="cap-icon">🤖</div>
+                        <h4>AI 能力</h4>
+                        <p>占位描述</p>
+                    </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- 联系方式 -->
-        <div class="contact">
-            <h3>联系方式</h3>
-            <p>邮箱：<a href="mailto:275029558@qq.com">275029558@qq.com</a></p>
+    <!-- ③ 联系 -->
+    <section id="contact" class="section">
+        <div class="section-label">CONTACT</div>
+        <h2>联系我</h2>
+        <p>邮箱：<a href="mailto:275029558@qq.com">275029558@qq.com</a></p>
+        <div class="social-links">
+            <a href="https://www.xiaohongshu.com/user/profile/186460695" target="_blank">小红书</a>
+            <span class="social-sep">/</span>
+            <span>微信公众号 · 四方屋</span>
         </div>
     </section>
 
     <!-- 底部 -->
     <footer>
-        <p>© 2025 张强 · 用 AI 的力量学习与创造</p>
+        <p>© 2025 张强 · AI 时代的产品 Builder 与翻译官</p>
     </footer>
+
+    <script>
+        // 打字机效果：逐行打出标签，最终全部显示
+        const tags = [
+            '前百度高级产品经理',
+            'ToB 业务线负责人',
+            'GEO 增长架构师',
+            '白话 AI 创作者',
+            '产品思维实践者'
+        ];
+        const container = document.getElementById('heroSubtitle');
+        let tagIndex = 0;
+        let charIndex = 0;
+        let currentLine = null;
+        const typeSpeed = 60;  // 每个字的打字速度（ms）
+        const lineDelay = 300; // 换行后的停顿（ms）
+
+        function typeWriter() {
+            // 开始打新的一行
+            if (charIndex === 0) {
+                currentLine = document.createElement('span');
+                currentLine.className = 'tag-line';
+                container.appendChild(currentLine);
+            }
+
+            // 打当前字
+            currentLine.textContent += tags[tagIndex][charIndex];
+            charIndex++;
+
+            // 当前行打完
+            if (charIndex >= tags[tagIndex].length) {
+                tagIndex++;
+                charIndex = 0;
+
+                // 还有下一行
+                if (tagIndex < tags.length) {
+                    setTimeout(typeWriter, lineDelay);
+                } else {
+                    // 全部打完，闪烁光标消失
+                    container.classList.add('done');
+                }
+                return;
+            }
+
+            setTimeout(typeWriter, typeSpeed);
+        }
+
+        // 标题第二行动画结束后开始打字（约 1.5s）
+        setTimeout(typeWriter, 1600);
+    </script>
+    <script src="hero-bg.js"></script>
 </body>
 </html>
