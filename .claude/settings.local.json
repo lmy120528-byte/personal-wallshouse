@@ -5,7 +5,11 @@
       "Bash(open http://localhost:8080)",
       "Bash(sips -g pixelWidth -g pixelHeight \"/Users/zhangqiang/personal-site/images/生成都市夜景图.png\")",
       "Bash(git --version)",
-      "Bash(git config *)"
+      "Bash(git config *)",
+      "Bash(open http://localhost:8080/projects.html)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }

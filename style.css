@@ -270,6 +270,513 @@ nav {
     font-size: 13px;
 }
 
+/* ===== 子页时间轴同首页宽度 ===== */
+.page-timeline-section {
+    max-width: 1100px !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    padding-top: 60px !important;
+    background: var(--bg-alt);
+    max-width: none !important;
+}
+
+.page-timeline-section .timeline {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* ===== 模块背景交替 ===== */
+.section-alt {
+    background: linear-gradient(180deg, #0c0c0c 0%, #0f0f0f 40%, #0f0f0f 60%, #0c0c0c 100%);
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.section-alt .section-label,
+.section-alt h2 {
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+/* ===== 页面头部（项目经历 / 文章页） ===== */
+.page-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 100px 24px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+    gap: 64px;
+}
+
+.page-hero-content {
+    flex: 0 0 auto;
+    padding-left: 24px;
+}
+
+.page-hero-content h2 {
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
+.page-hero-img {
+    width: 420px;
+    height: 260px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    overflow: visible;
+    position: relative;
+}
+
+/* 四边黑色渐变融入背景，黑色部分更多 */
+.page-hero-img::before {
+    content: '';
+    position: absolute;
+    inset: -60px;
+    background: radial-gradient(ellipse at center, transparent 15%, #090909 70%);
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* 中部提亮 */
+.page-hero-img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.12) 0%, transparent 55%);
+    z-index: 1;
+    pointer-events: none;
+    border-radius: 14px;
+}
+
+/* 点阵装饰 + 光晕 */
+.hero-img-placeholder {
+    width: 100%;
+    height: 100%;
+    background: #0d0d0d;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-img-placeholder::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 70% 30%, rgba(94, 234, 212, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 30% 60%, rgba(99, 102, 241, 0.06) 0%, transparent 35%),
+        radial-gradient(circle at 60% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 30%);
+}
+
+.hero-img-placeholder::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px),
+        radial-gradient(circle, rgba(255,255,255,0.1) 1.5px, transparent 1.5px),
+        radial-gradient(circle, rgba(94,234,212,0.18) 2px, transparent 2px);
+    background-size: 40px 40px, 80px 80px, 120px 120px;
+    background-position: 10px 10px, 30px 50px, 60px 20px;
+}
+
+/* ===== 项目经历 ===== */
+#experience.section {
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#experience .section-label,
+#experience h2 {
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.timeline {
+    position: relative;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* 竖线 */
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 120px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* 每个公司节点 */
+.tl-item {
+    display: flex;
+    gap: 44px;
+    padding-bottom: 80px;
+}
+
+.tl-item:last-child {
+    padding-bottom: 0;
+}
+
+/* 时间标记 —— 粘性滚动，随页面滚动下移 */
+.tl-marker {
+    position: sticky;
+    top: 80px;
+    display: flex;
+    align-items: center;
+    width: 100px;
+    height: 24px;
+    flex-shrink: 0;
+    padding-top: 2px;
+}
+
+/* JS 给当前活跃的 marker 加高亮 */
+.tl-marker.is-active .tl-time {
+    color: #fff;
+}
+
+.tl-time {
+    font-size: 14px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+/* 圆点右边缘对齐 marker 右边缘外 5px → 圆心正好落在竖线上 */
+.tl-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+    position: absolute;
+    right: -5px;
+    z-index: 2;
+}
+
+.tl-dot.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 14px rgba(94, 234, 212, 0.35);
+}
+
+.tl-dot.more {
+    background: transparent;
+    border: 2px dashed rgba(255, 255, 255, 0.12);
+}
+
+/* 右侧主体 */
+.tl-body {
+    flex: 1;
+    min-width: 0;
+}
+
+/* 公司区块 */
+.company-block {
+    background: rgba(255, 255, 255, 0.018);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 32px 36px;
+    margin-bottom: 20px;
+    transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.company-block:hover {
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.028);
+}
+
+.company-block:hover .company-tags span {
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #ccc;
+}
+
+/* 项目整体区块 */
+.projects-block {
+    background: rgba(255, 255, 255, 0.018);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 8px 36px 12px;
+    transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.projects-block:hover {
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.028);
+}
+
+/* 公司头部 */
+.company-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.company-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.geo-logo {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+.baidu-logo {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.yyk-logo {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.rjl-logo {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.company-name {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 2px;
+    line-height: 1.2;
+}
+
+.company-role {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* 公司标签 */
+.company-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.company-tags span {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-muted);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+/* 项目卡片列表 */
+.project-cards {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 项目之间用分割线区隔 */
+.project-card + .project-card {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 32px;
+}
+
+/* 项目间距紧凑 */
+.project-card:first-child {
+    padding-top: 24px;
+}
+
+.project-card:last-child {
+    padding-bottom: 20px;
+}
+
+/* 单个项目 */
+.project-card {
+    padding: 28px 0;
+}
+
+/* 单个项目 —— 画册风格：标题+描述在上，大图在中，指标在下 */
+.project-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 40px 0;
+}
+
+.project-card:hover .img-placeholder {
+    filter: brightness(1.1);
+}
+
+.project-card:hover .stat-item {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.project-card:hover .stat-value {
+    color: var(--text);
+}
+
+.project-card:hover .project-title {
+    color: var(--accent);
+}
+
+/* 上方内容 */
+.project-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.project-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text);
+}
+
+.project-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* 大图 */
+.project-img {
+    width: 100%;
+    height: 340px;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 数据指标 —— 覆盖在图片左下角，半透明 */
+.project-stats {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    display: flex;
+    gap: 10px;
+    z-index: 2;
+}
+
+.stat-item {
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    padding: 10px 16px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.project-card:hover .stat-item {
+    background: rgba(0, 0, 0, 0.75);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.stat-value {
+    display: block;
+    font-size: 16px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.55);
+    transition: color 0.3s ease;
+}
+
+.project-card:hover .stat-value {
+    color: #fff;
+}
+
+.stat-label {
+    display: block;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.35);
+    margin-top: 2px;
+    transition: color 0.3s ease;
+}
+
+.project-card:hover .stat-label {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.project-img .img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.12);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    position: relative;
+    border-radius: 10px;
+}
+
+/* 不同项目不同配色 */
+.project-card:nth-child(1) .img-placeholder {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+.project-card:nth-child(2) .img-placeholder {
+    background: linear-gradient(135deg, #1a102e 0%, #2d1b4e 50%, #1a1040 100%);
+}
+.project-card:nth-child(3) .img-placeholder {
+    background: linear-gradient(135deg, #102a2e 0%, #0d3b3b 50%, #0a3030 100%);
+}
+.project-card:nth-child(4) .img-placeholder {
+    background: linear-gradient(135deg, #2a1a1e 0%, #3d1b2b 50%, #301a28 100%);
+}
+
+.img-placeholder::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.03) 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 30%, rgba(255,255,255,0.02) 0%, transparent 50%);
+}
+
+/* 查看更多 */
+.tl-more .tl-marker {
+    position: relative;
+    top: auto;
+}
+
+.tl-view-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 28px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 100px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.tl-view-more:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: var(--text);
+    gap: 12px;
+}
+
 /* ===== 联系 ===== */
 .social-links {
     margin-top: 16px;
