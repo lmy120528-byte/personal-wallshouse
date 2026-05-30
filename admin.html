@@ -614,8 +614,8 @@
                 });
 
                 if (putResp.ok) {
-                    showToast('推送成功！Vercel 将自动部署', 'success');
-                    document.getElementById('actionHint').textContent = '完成！新增 ' + newArticles.length + ' 篇文章';
+                    showToast('推送成功！线上 Vercel 自动部署，本地需 git pull 同步', 'success');
+                    document.getElementById('actionHint').textContent = '完成！线上 ' + newArticles.length + ' 篇已部署。本地查看请执行 git pull';
                 } else {
                     var errData = await putResp.json();
                     throw new Error(errData.message || '推送失败');
