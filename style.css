@@ -1029,6 +1029,8 @@ nav {
     flex-wrap: wrap;
     gap: 5px;
     margin-bottom: 10px;
+    min-height: 22px;
+    flex-shrink: 0;
 }
 
 .ac-tags span {
@@ -1038,6 +1040,13 @@ nav {
     background: rgba(255, 255, 255, 0.04);
     color: var(--text-muted);
     border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s ease;
+}
+
+.article-card:hover .ac-tags span {
+    border-color: rgba(94, 234, 212, 0.3);
+    color: #ccc;
+    background: rgba(94, 234, 212, 0.06);
 }
 
 /* 摘要 */
