@@ -65,6 +65,21 @@ nav {
     opacity: 0.75;
 }
 
+/* 数字分身入口 */
+.nav-agent-btn {
+    border: 1px solid var(--accent) !important;
+    border-radius: 8px;
+    padding: 5px 14px !important;
+    color: var(--accent) !important;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+
+.nav-agent-btn:hover {
+    background: rgba(94, 234, 212, 0.1);
+    box-shadow: 0 0 12px rgba(94, 234, 212, 0.15);
+}
+
 .nav-icon {
     width: 28px;
     height: 28px;
