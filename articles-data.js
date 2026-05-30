@@ -76,6 +76,17 @@ var articles = [
     {
         series: 'ai',
         seriesName: '白话 AI',
+        title: '用户研究中的定量与定性',
+        date: '2026-05-03',
+        summary: '用户研究方法分为定性研究（解决“怎么想”）和定量研究（解决“怎么做”），两者可结合验证，如用户访谈与A/B测试的配合。',
+        wordCount: 1600,
+        readingTime: 6,
+        tags: ["用户研究方法","定性与定量"],
+        url: 'https://mp.weixin.qq.com/s/o4dX0aSN_35NeI6ozcV_Gw'
+    },
+    {
+        series: 'ai',
+        seriesName: '白话 AI',
         title: '什么是大语言模型？用做菜来理解 LLM 的原理',
         date: '2026-05-18',
         summary: '不用任何术语，用"做菜"这个生活场景帮你理解大语言模型到底是怎么工作的。',
