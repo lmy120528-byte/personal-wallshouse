@@ -466,14 +466,17 @@ nav {
     position: relative;
 }
 
-/* 四边黑色渐变融入背景，黑色部分更多 */
+/* 四边向中心暗角融合，消除背景图轮廓 */
 .page-hero-img::before {
     content: '';
     position: absolute;
-    inset: -60px;
-    background: radial-gradient(ellipse at center, transparent 15%, #090909 70%);
+    inset: 0;
+    background:
+        linear-gradient(to bottom, #090909 0%, transparent 25%, transparent 75%, #090909 100%),
+        linear-gradient(to right,   #090909 0%, transparent 22%, transparent 78%, #090909 100%);
     z-index: 2;
     pointer-events: none;
+    border-radius: 14px;
 }
 
 /* 中部提亮 */
