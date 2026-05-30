@@ -501,10 +501,10 @@ nav {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(circle at 70% 30%, rgba(94, 234, 212, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 30% 60%, rgba(99, 102, 241, 0.06) 0%, transparent 35%),
-        radial-gradient(circle at 60% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 30%);
-    animation: breathe-glow 5s ease-in-out infinite;
+        radial-gradient(circle at 70% 30%, rgba(94, 234, 212, 0.22) 0%, transparent 40%),
+        radial-gradient(circle at 30% 60%, rgba(99, 102, 241, 0.16) 0%, transparent 35%),
+        radial-gradient(circle at 60% 80%, rgba(59, 130, 246, 0.14) 0%, transparent 30%);
+    animation: breathe-glow 3s ease-in-out infinite;
 }
 
 /* 文章页 —— 暖色光晕 + 横线纹理，边缘融入背景 */
@@ -513,12 +513,12 @@ nav {
     position: absolute;
     inset: -60px;
     background:
-        radial-gradient(circle at 70% 30%, rgba(245, 158, 11, 0.12) 0%, transparent 35%),
-        radial-gradient(circle at 30% 60%, rgba(239, 68, 68, 0.07) 0%, transparent 30%),
+        radial-gradient(circle at 70% 30%, rgba(245, 158, 11, 0.3) 0%, transparent 35%),
+        radial-gradient(circle at 30% 60%, rgba(239, 68, 68, 0.18) 0%, transparent 30%),
         radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.7) 60%, rgba(9,9,9,1) 100%);
     z-index: 2;
     pointer-events: none;
-    animation: breathe-glow 6s ease-in-out infinite;
+    animation: breathe-glow 3.5s ease-in-out infinite;
 }
 
 .hero-img-placeholder.hero-img-articles::after {
@@ -531,7 +531,7 @@ nav {
         repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(255,255,255,0.03) 60px, rgba(255,255,255,0.03) 61px);
     pointer-events: none;
     border-radius: 14px;
-    animation: breathe-texture 8s ease-in-out infinite;
+    animation: breathe-texture 5.5s ease-in-out infinite;
 }
 
 .hero-img-placeholder::after {
@@ -544,7 +544,7 @@ nav {
         radial-gradient(circle, rgba(94,234,212,0.18) 2px, transparent 2px);
     background-size: 40px 40px, 80px 80px, 120px 120px;
     background-position: 10px 10px, 30px 50px, 60px 20px;
-    animation: breathe-texture 7s ease-in-out infinite;
+    animation: breathe-texture 4.5s ease-in-out infinite;
 }
 
 /* ===== 项目经历 ===== */
@@ -1351,11 +1351,11 @@ footer {
 
 /* ===== 二级页背景呼吸动画 ===== */
 @keyframes breathe-glow {
-    0%, 100% { opacity: 0.6; }
+    0%, 100% { opacity: 0.35; }
     50%      { opacity: 1; }
 }
 
 @keyframes breathe-texture {
-    0%, 100% { opacity: 0.5; }
-    50%      { opacity: 0.85; }
+    0%, 100% { opacity: 0.3; }
+    50%      { opacity: 1; }
 }
