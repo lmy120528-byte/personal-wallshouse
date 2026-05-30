@@ -1004,13 +1004,14 @@ nav {
     color: var(--text-muted);
 }
 
-/* 标题 */
+/* 标题：固定两行高度，保证标签行对齐 */
 .ac-title {
     font-size: 17px;
     font-weight: 600;
     line-height: 1.5;
-    margin-bottom: 10px;
-    flex: 1;
+    margin-bottom: 4px;
+    min-height: 51px;
+    flex-shrink: 0;
 }
 
 .ac-title a {
