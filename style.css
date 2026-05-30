@@ -272,15 +272,39 @@ nav {
     border-radius: 16px;
     padding: 36px 32px 32px;
     transition: border-color 0.3s ease, transform 0.2s ease, background 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
 }
 
 .cap-card:hover {
     border-color: rgba(94, 234, 212, 0.25);
     transform: translateY(-3px);
     background: rgba(255, 255, 255, 0.04);
+}
+
+.cap-card-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: 28px;
+}
+
+.cap-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+}
+
+.cap-icon {
+    flex-shrink: 0;
+    color: var(--accent);
+    opacity: 0.25;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    margin-top: -4px;
+}
+
+.cap-card:hover .cap-icon {
+    opacity: 0.5;
+    transform: scale(1.05);
 }
 
 .cap-head h4 {
@@ -311,6 +335,13 @@ nav {
     color: var(--text-muted);
     border: 1px solid rgba(255, 255, 255, 0.06);
     letter-spacing: 0.3px;
+    transition: all 0.3s ease;
+}
+
+.cap-card:hover .cap-tags span {
+    border-color: rgba(94, 234, 212, 0.3);
+    color: #ccc;
+    background: rgba(94, 234, 212, 0.06);
 }
 
 .cap-desc {
@@ -323,6 +354,33 @@ nav {
 /* 关于模块也放在 section-alt 中，覆盖 h2 的边距 */
 #about h2 {
     margin-bottom: 32px;
+}
+
+/* ===== 各区块不同背景色区分 ===== */
+#about.section-alt {
+    background: linear-gradient(180deg, #0a0a0f 0%, #0d0d14 40%, #0d0d14 60%, #0a0a0f 100%);
+}
+
+#articles.section-alt {
+    background: linear-gradient(180deg, #0c0e0c 0%, #101410 40%, #101410 60%, #0c0e0c 100%);
+}
+
+#experience.section-alt {
+    background: linear-gradient(180deg, #0c0c0c 0%, #0f0f0f 40%, #0f0f0f 60%, #0c0c0c 100%);
+}
+
+#contact.section-alt {
+    background: linear-gradient(180deg, #0e0e0e 0%, #121212 40%, #121212 60%, #0e0e0e 100%);
+}
+
+/* 联系我 —— 邮箱排版修正 */
+#contact p {
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 24px;
+    padding-right: 24px;
+    font-size: 15px;
 }
 
 /* ===== 通用 Section 样式修正：section-alt 中 p 的宽度 ===== */
