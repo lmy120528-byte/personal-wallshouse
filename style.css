@@ -444,6 +444,7 @@ nav {
     max-width: 1100px;
     margin: 0 auto;
     gap: 64px;
+    overflow: hidden;
 }
 
 .page-hero-content {
