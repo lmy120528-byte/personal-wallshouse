@@ -10,10 +10,13 @@
     <!-- 导航栏 -->
     <nav>
         <div class="nav-left">
-            <img src="images/avatar.png" alt="张强" class="nav-icon">
-            <span class="nav-brand">Product Builder</span>
+            <a href="index.html" class="nav-home-link">
+                <img src="images/avatar.png" alt="张强" class="nav-icon">
+                <span class="nav-brand">Product Builder</span>
+            </a>
         </div>
         <div class="nav-right">
+            <a href="index.html">首页</a>
             <a href="#about">关于</a>
             <a href="projects.html">项目经历</a>
             <a href="articles.html">文章</a>
@@ -211,7 +214,28 @@
         </div>
     </section>
 
-    <!-- ④ 联系 -->
+    <!-- ⑤ 文章 -->
+    <section id="articles" class="section section-alt">
+        <div class="section-label">ARTICLES</div>
+        <h2>文章</h2>
+        <p class="articles-desc">记录 GEO 一线实操经验与 AI 科普思考</p>
+
+        <!-- Tab 切换 -->
+        <div class="articles-tabs" id="articlesTabs">
+            <button class="articles-tab" data-series="geo">GEO 实战</button>
+            <button class="articles-tab" data-series="ai">白话 AI</button>
+        </div>
+
+        <!-- 卡片网格 -->
+        <div class="articles-grid" id="articlesGrid"></div>
+
+        <!-- 查看更多 -->
+        <div class="articles-more">
+            <a href="articles.html" class="tl-view-more">查看全部文章 →</a>
+        </div>
+    </section>
+
+    <!-- ⑥ 联系 -->
     <section id="contact" class="section section-alt">
         <div class="section-label">CONTACT</div>
         <h2>联系我</h2>
@@ -297,6 +321,73 @@
 
             window.addEventListener('scroll', update, { passive: true });
             update();
+        })();
+    </script>
+    <script src="articles-data.js"></script>
+    <script>
+        // ===== 文章卡片渲染 & Tab 切换 =====
+        (function () {
+            var grid = document.getElementById('articlesGrid');
+            var tabs = document.querySelectorAll('#articlesTabs .articles-tab');
+            var activeSeries = null;
+
+            // 格式化字数：3200 → "3.2k 字"
+            function fmtWords(n) {
+                return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k 字';
+            }
+
+            // 格式化阅读时长
+            function fmtTime(min) {
+                return '约 ' + min + ' 分钟';
+            }
+
+            // 渲染单张卡片
+            function cardHTML(a) {
+                return '<div class="article-card" data-series="' + a.series + '">'
+                    + '<div class="ac-top">'
+                    + '<span class="ac-series ac-series--' + a.series + '">' + a.seriesName + '</span>'
+                    + '<span class="ac-date">' + a.date + '</span>'
+                    + '</div>'
+                    + '<h3 class="ac-title"><a href="' + a.url + '" target="_blank" rel="noopener">' + a.title + '</a></h3>'
+                    + '<p class="ac-summary">' + a.summary + '</p>'
+                    + '<div class="ac-meta">'
+                    + '<span>' + fmtWords(a.wordCount) + '</span>'
+                    + '<span class="ac-sep">·</span>'
+                    + '<span>' + fmtTime(a.readingTime) + '</span>'
+                    + '</div>'
+                    + '<a href="' + a.url + '" target="_blank" rel="noopener" class="ac-read-link">阅读原文 →</a>'
+                    + '</div>';
+            }
+
+            // 渲染全部卡片（首页只展示最近 6 篇）
+            function render(filter) {
+                var filtered = articles;
+                if (filter) {
+                    filtered = articles.filter(function (a) { return a.series === filter; });
+                }
+                // 首页取前 6 篇
+                var show = filtered.slice(0, 6);
+                grid.innerHTML = show.map(cardHTML).join('');
+            }
+
+            // Tab 点击
+            tabs.forEach(function (tab) {
+                tab.addEventListener('click', function () {
+                    var series = this.dataset.series;
+                    if (activeSeries === series) {
+                        // 再次点击取消选中 → 显示全部
+                        activeSeries = null;
+                        tabs.forEach(function (t) { t.classList.remove('active'); });
+                    } else {
+                        activeSeries = series;
+                        tabs.forEach(function (t) { t.classList.toggle('active', t.dataset.series === series); });
+                    }
+                    render(activeSeries);
+                });
+            });
+
+            // 初始渲染（全部）
+            render(null);
         })();
     </script>
 </body>

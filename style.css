@@ -49,6 +49,22 @@ nav {
     gap: 10px;
 }
 
+.nav-home-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: inherit;
+    border-radius: 8px;
+    padding: 4px 8px;
+    margin: -4px -8px;
+    transition: opacity 0.2s ease;
+}
+
+.nav-home-link:hover {
+    opacity: 0.75;
+}
+
 .nav-icon {
     width: 28px;
     height: 28px;
@@ -294,7 +310,11 @@ nav {
 }
 
 .section-alt .section-label,
-.section-alt h2 {
+.section-alt h2,
+.section-alt .articles-desc,
+.section-alt .articles-tabs,
+.section-alt .articles-grid,
+.section-alt .articles-more {
     max-width: 1100px;
     margin-left: auto;
     margin-right: auto;
@@ -775,6 +795,284 @@ nav {
     border-color: rgba(255, 255, 255, 0.3);
     color: var(--text);
     gap: 12px;
+}
+
+/* ===== 文章区 ===== */
+.articles-desc {
+    color: var(--text-muted);
+    font-size: 15px;
+    margin-top: -28px;
+    margin-bottom: 32px;
+}
+
+/* Tab 切换栏 */
+.articles-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 36px;
+}
+
+.articles-tab {
+    font-size: 14px;
+    padding: 8px 20px;
+    border-radius: 100px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-family: inherit;
+    letter-spacing: 0.5px;
+}
+
+.articles-tab:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #ccc;
+}
+
+.articles-tab.active {
+    background: rgba(94, 234, 212, 0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* 卡片网格 —— 3 列 */
+.articles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+/* 单张卡片 */
+.article-card {
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.3s ease, transform 0.2s ease, background 0.3s ease;
+}
+
+.article-card:hover {
+    border-color: rgba(255, 255, 255, 0.18);
+    transform: translateY(-3px);
+    background: #141414;
+}
+
+/* 卡片顶部：系列标签 + 日期 */
+.ac-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.ac-series {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+.ac-series--geo {
+    background: rgba(99, 102, 241, 0.15);
+    color: #a5b4fc;
+}
+
+.ac-series--ai {
+    background: rgba(16, 185, 129, 0.15);
+    color: #6ee7b7;
+}
+
+.ac-date {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* 标题 */
+.ac-title {
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.5;
+    margin-bottom: 10px;
+    flex: 1;
+}
+
+.ac-title a {
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.article-card:hover .ac-title a {
+    color: var(--accent);
+}
+
+/* 摘要 */
+.ac-summary {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 16px;
+    /* 最多显示 3 行 */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* 元信息：字数 · 阅读时长 */
+.ac-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ac-sep {
+    color: rgba(255, 255, 255, 0.15);
+}
+
+/* 阅读原文 */
+.ac-read-link {
+    font-size: 13px;
+    color: var(--accent);
+    text-decoration: none;
+    transition: gap 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: auto;
+}
+
+.ac-read-link:hover {
+    gap: 8px;
+}
+
+/* 查看更多按钮 */
+.articles-more {
+    text-align: center;
+    margin-top: 48px;
+}
+
+/* 文章页 —— 全宽背景 */
+.page-articles-section {
+    max-width: 1100px !important;
+    padding-top: 40px !important;
+    background: var(--bg-alt);
+    max-width: none !important;
+}
+
+.page-articles-section .articles-tabs,
+.page-articles-section .articles-grid,
+.page-articles-section .articles-more {
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.page-articles-section .articles-tabs {
+    padding: 0 24px;
+}
+
+.page-articles-section .articles-grid {
+    padding: 0 24px;
+}
+
+/* 文章二级页 —— 头部描述 */
+.articles-hero-desc {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.8;
+    margin-top: 8px;
+}
+
+.articles-hero-links {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 12px;
+}
+
+.articles-hero-links a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.articles-hero-links a:hover {
+    opacity: 0.8;
+}
+
+/* 微信公众号 QR 触发 */
+.wechat-qr-trigger {
+    color: var(--accent);
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+}
+
+.wechat-qr-trigger:hover {
+    opacity: 0.8;
+}
+
+/* QR 弹出层 */
+.wechat-qr-popup {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a1a;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    z-index: 50;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+.wechat-qr-popup img {
+    border-radius: 8px;
+    display: block;
+}
+
+.qr-tip {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+}
+
+/* hover 时显示 */
+.wechat-qr-trigger:hover .wechat-qr-popup {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 小三角箭头 */
+.wechat-qr-popup::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1a1a1a;
+}
+
+/* 文章页网格：桌面 3 列 */
+.page-articles-section .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
 }
 
 /* ===== 联系 ===== */

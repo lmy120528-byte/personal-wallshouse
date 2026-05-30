@@ -9,10 +9,13 @@
 <body>
     <nav>
         <div class="nav-left">
-            <img src="images/avatar.png" alt="张强" class="nav-icon">
-            <span class="nav-brand">Product Builder</span>
+            <a href="index.html" class="nav-home-link">
+                <img src="images/avatar.png" alt="张强" class="nav-icon">
+                <span class="nav-brand">Product Builder</span>
+            </a>
         </div>
         <div class="nav-right">
+            <a href="index.html">首页</a>
             <a href="index.html#about">关于</a>
             <a href="projects.html">项目经历</a>
             <a href="articles.html">文章</a>
@@ -20,14 +23,98 @@
         </div>
     </nav>
 
-    <section class="section" style="padding-top: 140px;">
-        <div class="section-label">ARTICLES</div>
-        <h2>文章</h2>
-        <p>占位内容 —— GEO实战 与 白话AI 两个系列。</p>
+    <!-- 页面头部 -->
+    <section class="page-hero">
+        <div class="page-hero-content">
+            <div class="section-label">ARTICLES</div>
+            <h2>文章</h2>
+            <p class="articles-hero-desc">
+                AI 产品转型 · GEO 实战经验 · AI 认知科普<br>
+                希望 AI 能普惠我们的工作和生活
+            </p>
+            <p class="articles-hero-links">
+                文章可查看我的
+                <a href="https://www.xiaohongshu.com/user/profile/5a72e62d11be1075d547fdda?xsec_token=AB0j01-214_SEtLOgjdHIBEpETUYfaSFHNS0PVePqbSFI%3D&xsec_source=pc_search" target="_blank" rel="noopener">小红书「同路人」</a>
+                或
+                <span class="wechat-qr-trigger" id="qrTrigger">
+                    微信公众号「四方屋」
+                    <span class="wechat-qr-popup" id="qrPopup">
+                        <img src="images/维系公众号二维码.jpg" alt="微信公众号二维码" width="160" height="160">
+                        <span class="qr-tip">扫码关注</span>
+                    </span>
+                </span>
+            </p>
+        </div>
+        <div class="page-hero-img">
+            <div class="hero-img-placeholder"></div>
+        </div>
+    </section>
+
+    <!-- 文章列表 -->
+    <section class="section page-articles-section">
+        <div class="articles-tabs" id="articlesTabs">
+            <button class="articles-tab" data-series="geo">GEO 实战</button>
+            <button class="articles-tab" data-series="ai">白话 AI</button>
+        </div>
+
+        <div class="articles-grid" id="articlesGrid"></div>
+
+        <div class="articles-more" style="margin-top: 48px; text-align: center;">
+            <a href="index.html#articles" class="tl-view-more">← 返回首页</a>
+        </div>
     </section>
 
     <footer>
         <p>© 2025 张强 · AI 时代的产品 Builder 与翻译官</p>
     </footer>
+
+    <script src="articles-data.js"></script>
+    <script>
+        // ===== 文章列表渲染 & Tab 切换 =====
+        (function () {
+            var grid = document.getElementById('articlesGrid');
+            var tabs = document.querySelectorAll('#articlesTabs .articles-tab');
+            var activeSeries = null;
+
+            function fmtWords(n) { return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k 字'; }
+            function fmtTime(min) { return '约 ' + min + ' 分钟'; }
+
+            function cardHTML(a) {
+                var p = [];
+                p.push('<div class="article-card" data-series="' + a.series + '">');
+                p.push('<div class="ac-top"><span class="ac-series ac-series--' + a.series + '">' + a.seriesName + '</span>');
+                p.push('<span class="ac-date">' + a.date + '</span></div>');
+                p.push('<h3 class="ac-title"><a href="' + a.url + '" target="_blank" rel="noopener">' + a.title + '</a></h3>');
+                p.push('<p class="ac-summary">' + a.summary + '</p>');
+                p.push('<div class="ac-meta"><span>' + fmtWords(a.wordCount) + '</span>');
+                p.push('<span class="ac-sep">·</span>');
+                p.push('<span>' + fmtTime(a.readingTime) + '</span></div>');
+                p.push('<a href="' + a.url + '" target="_blank" rel="noopener" class="ac-read-link">阅读原文 →</a>');
+                p.push('</div>');
+                return p.join('');
+            }
+
+            function render(filter) {
+                var filtered = filter ? articles.filter(function (a) { return a.series === filter; }) : articles;
+                grid.innerHTML = filtered.map(cardHTML).join('');
+            }
+
+            tabs.forEach(function (tab) {
+                tab.addEventListener('click', function () {
+                    var series = this.dataset.series;
+                    if (activeSeries === series) {
+                        activeSeries = null;
+                        tabs.forEach(function (t) { t.classList.remove('active'); });
+                    } else {
+                        activeSeries = series;
+                        tabs.forEach(function (t) { t.classList.toggle('active', t.dataset.series === series); });
+                    }
+                    render(activeSeries);
+                });
+            });
+
+            render(null);
+        })();
+    </script>
 </body>
 </html>
