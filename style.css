@@ -272,6 +272,7 @@ nav {
     border-radius: 16px;
     padding: 36px 32px 32px;
     transition: border-color 0.3s ease, transform 0.2s ease, background 0.3s ease;
+    height: 100%;
 }
 
 .cap-card:hover {
@@ -284,6 +285,7 @@ nav {
     display: flex;
     align-items: flex-start;
     gap: 28px;
+    height: 100%;
 }
 
 .cap-left {
@@ -292,6 +294,11 @@ nav {
     flex-direction: column;
     gap: 16px;
     min-width: 0;
+    height: 100%;
+}
+
+.cap-desc {
+    flex: 1;
 }
 
 .cap-icon {
@@ -1059,7 +1066,6 @@ nav {
 
 /* 查看更多按钮 */
 .articles-more {
-    text-align: center;
     margin-top: 48px;
 }
 
