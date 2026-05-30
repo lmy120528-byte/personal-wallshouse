@@ -69,11 +69,10 @@ nav {
 .nav-agent-btn {
     border: 1px solid var(--accent) !important;
     border-radius: 8px;
-    padding: 4px 14px !important;
+    padding: 6px 18px !important;
     color: var(--accent) !important;
     font-weight: 600;
     font-size: 13px;
-    line-height: 1;
     transition: all 0.25s ease;
 }
 
