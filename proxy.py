@@ -24,7 +24,11 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_POST(self):
-        """转发 POST 请求到 DeepSeek API"""
+        """路由：/analyze → DeepSeek，/git-pull → 本地同步"""
+        if self.path == '/git-pull':
+            self._handle_git_pull()
+            return
+
         if self.path != '/analyze':
             self.send_response(404)
             self._cors_headers()
@@ -63,6 +67,30 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
         except urllib.error.HTTPError as e:
             err_body = e.read().decode('utf-8', errors='replace')
             self._error(e.code, err_body[:500])
+        except Exception as e:
+            self._error(500, str(e))
+
+    def _handle_git_pull(self):
+        """执行 git pull 同步本地文件"""
+        import subprocess
+        try:
+            result = subprocess.run(
+                ['git', 'pull', 'origin', 'main'],
+                capture_output=True, text=True, timeout=30,
+                cwd=os.path.dirname(os.path.abspath(__file__))
+            )
+            output = result.stdout + result.stderr
+            if result.returncode == 0:
+                self.send_response(200)
+                self._cors_headers()
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({
+                    'ok': True,
+                    'output': output.strip()
+                }).encode('utf-8'))
+            else:
+                self._error(500, output.strip())
         except Exception as e:
             self._error(500, str(e))
 

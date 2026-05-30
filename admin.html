@@ -614,8 +614,19 @@
                 });
 
                 if (putResp.ok) {
-                    showToast('推送成功！线上 Vercel 自动部署，本地需 git pull 同步', 'success');
-                    document.getElementById('actionHint').textContent = '完成！线上 ' + newArticles.length + ' 篇已部署。本地查看请执行 git pull';
+                    // 自动同步本地文件
+                    try {
+                        var syncResp = await fetch('http://localhost:8081/git-pull', { method: 'POST' });
+                        var syncData = await syncResp.json();
+                        if (syncData.ok) {
+                            showToast('推送成功！本地已自动同步，刷新页面即可', 'success');
+                        } else {
+                            showToast('推送成功！但本地同步失败: ' + syncData.output, 'error');
+                        }
+                    } catch (syncErr) {
+                        showToast('推送成功！Vercel 自动部署中。本地需手动 git pull', 'success');
+                    }
+                    document.getElementById('actionHint').textContent = '完成！新增 ' + newArticles.length + ' 篇文章';
                 } else {
                     var errData = await putResp.json();
                     throw new Error(errData.message || '推送失败');
