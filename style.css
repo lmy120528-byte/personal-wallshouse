@@ -274,6 +274,7 @@ nav {
     transition: border-color 0.3s ease, transform 0.2s ease, background 0.3s ease;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .cap-card:hover {
@@ -282,20 +283,14 @@ nav {
     background: rgba(255, 255, 255, 0.04);
 }
 
-.cap-card-inner {
-    display: flex;
-    align-items: flex-start;
-    gap: 28px;
-    flex: 1;
-}
-
+.cap-card-inner,
 .cap-left {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 16px;
     min-width: 0;
-    align-self: stretch;
+    padding-right: 64px;
 }
 
 .cap-head {
@@ -303,11 +298,13 @@ nav {
 }
 
 .cap-icon {
-    flex-shrink: 0;
+    position: absolute;
+    top: 32px;
+    right: 28px;
     color: var(--accent);
     opacity: 0.25;
     transition: opacity 0.3s ease, transform 0.3s ease;
-    margin-top: -4px;
+    pointer-events: none;
 }
 
 .cap-card:hover .cap-icon {
