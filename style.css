@@ -336,13 +336,14 @@ nav {
 
 .cap-tags span {
     font-size: 11px;
-    padding: 4px 12px;
+    padding: 3px 10px;
     border-radius: 100px;
     background: rgba(255, 255, 255, 0.04);
     color: var(--text-muted);
     border: 1px solid rgba(255, 255, 255, 0.06);
     letter-spacing: 0.3px;
     transition: all 0.3s ease;
+    white-space: nowrap;
 }
 
 .cap-card:hover .cap-tags span {
