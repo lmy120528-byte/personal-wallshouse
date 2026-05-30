@@ -1,21 +1,21 @@
 /**
  * 文章数据中心
  * 新增文章：在数组中加一条记录即可，GitHub push 后 Vercel 自动更新
- *
- * 字段说明：
- *   series     - 'geo' = GEO实战, 'ai' = 白话AI
- *   seriesName - 系列中文名（卡片上显示的标签）
- *   title      - 文章标题
- *   date       - 发布日期 YYYY-MM-DD
- *   summary    - 内容概要（一两句话）
- *   wordCount  - 字数
- *   readingTime - 阅读时长（分钟）
- *   tags       - 标签数组
- *   url        - 公众号原文链接
  */
 var articles = [
 
     // ===== GEO 实战 =====
+    {
+        series: 'geo',
+        seriesName: 'GEO 实战',
+        title: 'GEO做法解析——两端一连接',
+        date: '2026-05-17',
+        summary: 'GEO优化需从传统SEO转向“两端一连接”框架：品牌端构建模型可理解的结构化内容资产，模型端理解AI认知逻辑，连接端布局多源可交叉验证的信息网络。',
+        wordCount: 3600,
+        readingTime: 14,
+        tags: ["GEO优化","两端一连接"],
+        url: 'https://mp.weixin.qq.com/s/QOC8w1hSxbkbHdAgQY7qDw'
+    },
     {
         series: 'geo',
         seriesName: 'GEO 实战',
@@ -24,7 +24,7 @@ var articles = [
         summary: '提出GEO行业定位的三维模型：模型/用户分层、行业/场景分层、品牌/规模分层，帮助品牌根据自身坐标选择差异化优化策略。',
         wordCount: 3600,
         readingTime: 14,
-        tags: ['GEO优化', '三维定位模型'],
+        tags: ["GEO优化","三维定位模型"],
         url: 'https://mp.weixin.qq.com/s/W-uFfKJYLwR-jtKOq8D8vw'
     },
     {
@@ -35,7 +35,7 @@ var articles = [
         summary: 'GEO不是在AI时代做SEO，而是为品牌构建可被模型理解的"认知体"。文章系统梳理了行业两种路线、四类服务商格局，提出"两端一连接"落地框架，最终指向品牌Agent作为行业终局。',
         wordCount: 5500,
         readingTime: 22,
-        tags: ['GEO认知体', '品牌Agent'],
+        tags: ["GEO认知体","品牌Agent"],
         url: 'https://mp.weixin.qq.com/s/sUgA3lK6pUNyOQGY4J_PhA'
     },
     {
@@ -46,7 +46,7 @@ var articles = [
         summary: '基于一线实操经验，总结出让 AI 搜索引擎更愿意引用你内容的三条关键原则和实操技巧。',
         wordCount: 2800,
         readingTime: 11,
-        tags: ['GEO', 'AI搜索', '内容优化'],
+        tags: ["GEO","AI搜索","内容优化"],
         url: 'https://mp.weixin.qq.com/s/sUgA3lK6pUNyOQGY4J_PhA'
     },
     {
@@ -57,7 +57,7 @@ var articles = [
         summary: '为什么用传统 SEO 的思维做 GEO 行不通？深入分析两种范式的底层逻辑差异与应对策略。',
         wordCount: 3500,
         readingTime: 14,
-        tags: ['GEO', 'SEO', '思维模式'],
+        tags: ["GEO","SEO","思维模式"],
         url: 'https://mp.weixin.qq.com/s/sUgA3lK6pUNyOQGY4J_PhA'
     },
     {
@@ -68,7 +68,7 @@ var articles = [
         summary: '记录一次完整的 GEO 策略调整过程，从问题诊断、方案设计到效果验证的全链路实操复盘。',
         wordCount: 4100,
         readingTime: 16,
-        tags: ['GEO', '复盘', '增长'],
+        tags: ["GEO","复盘","增长"],
         url: 'https://mp.weixin.qq.com/s/sUgA3lK6pUNyOQGY4J_PhA'
     },
 
@@ -81,7 +81,7 @@ var articles = [
         summary: '不用任何术语，用"做菜"这个生活场景帮你理解大语言模型到底是怎么工作的。',
         wordCount: 2200,
         readingTime: 9,
-        tags: ['LLM', '科普', 'AI基础'],
+        tags: ["LLM","科普","AI基础"],
         url: 'https://mp.weixin.qq.com/s/sUgA3lK6pUNyOQGY4J_PhA'
     },
     {
@@ -92,7 +92,7 @@ var articles = [
         summary: '为什么有些人的 Prompt 效果好、有些不行？揭开提示词的神秘面纱，用大白话讲清楚原理。',
         wordCount: 1800,
         readingTime: 7,
-        tags: ['Prompt', '提示词', '科普'],
+        tags: ["Prompt","提示词","科普"],
         url: 'https://mp.weixin.qq.com/s/sUgA3lK6pUNyOQGY4J_PhA'
     },
     {
@@ -103,7 +103,7 @@ var articles = [
         summary: 'Agent 是当下 AI 圈最热的概念之一，但它不是魔法。用通俗的方式解释 Agent 的核心原理与应用场景。',
         wordCount: 2600,
         readingTime: 10,
-        tags: ['Agent', 'AI应用', '科普'],
+        tags: ["Agent","AI应用","科普"],
         url: 'https://mp.weixin.qq.com/s/sUgA3lK6pUNyOQGY4J_PhA'
     },
     {
@@ -114,7 +114,8 @@ var articles = [
         summary: '"词语变成数字就能让机器理解含义？"用最简单的例子讲清楚 Embedding 这个 AI 领域的基础概念。',
         wordCount: 2000,
         readingTime: 8,
-        tags: ['Embedding', 'NLP', '科普'],
+        tags: ["Embedding","NLP","科普"],
         url: 'https://mp.weixin.qq.com/s/sUgA3lK6pUNyOQGY4J_PhA'
     }
+
 ];
