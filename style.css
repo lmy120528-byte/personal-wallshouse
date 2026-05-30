@@ -506,7 +506,7 @@ nav {
 }
 
 /* 文章页 —— 暖色光晕 + 横线纹理，边缘融入背景 */
-.hero-img-articles::before {
+.hero-img-placeholder.hero-img-articles::before {
     content: '';
     position: absolute;
     inset: -60px;
@@ -518,7 +518,7 @@ nav {
     pointer-events: none;
 }
 
-.hero-img-articles::after {
+.hero-img-placeholder.hero-img-articles::after {
     content: '';
     position: absolute;
     inset: 0;
