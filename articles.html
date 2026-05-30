@@ -85,6 +85,9 @@
                 p.push('<div class="ac-top"><span class="ac-series ac-series--' + a.series + '">' + a.seriesName + '</span>');
                 p.push('<span class="ac-date">' + a.date + '</span></div>');
                 p.push('<h3 class="ac-title"><a href="' + a.url + '" target="_blank" rel="noopener">' + a.title + '</a></h3>');
+                if (a.tags && a.tags.length) {
+                    p.push('<div class="ac-tags">' + a.tags.map(function(t) { return '<span>' + t + '</span>'; }).join('') + '</div>');
+                }
                 p.push('<p class="ac-summary">' + a.summary + '</p>');
                 p.push('<div class="ac-meta"><span>' + fmtWords(a.wordCount) + '</span>');
                 p.push('<span class="ac-sep">·</span>');

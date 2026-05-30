@@ -398,6 +398,7 @@
                     + '<span class="ac-date">' + a.date + '</span>'
                     + '</div>'
                     + '<h3 class="ac-title"><a href="' + a.url + '" target="_blank" rel="noopener">' + a.title + '</a></h3>'
+                    + (a.tags && a.tags.length ? '<div class="ac-tags">' + a.tags.map(function(t) { return '<span>' + t + '</span>'; }).join('') + '</div>' : '')
                     + '<p class="ac-summary">' + a.summary + '</p>'
                     + '<div class="ac-meta">'
                     + '<span>' + fmtWords(a.wordCount) + '</span>'

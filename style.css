@@ -1023,6 +1023,23 @@ nav {
     color: var(--accent);
 }
 
+/* 文章标签 */
+.ac-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.ac-tags span {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-muted);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 /* 摘要 */
 .ac-summary {
     font-size: 13px;
