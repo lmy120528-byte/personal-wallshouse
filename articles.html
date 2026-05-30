@@ -96,7 +96,7 @@
 
             function render(filter) {
                 var filtered = filter ? articles.filter(function (a) { return a.series === filter; }) : articles;
-                grid.innerHTML = filtered.map(cardHTML).join('');
+                filtered.sort(function(a,b){return b.date.localeCompare(a.date);}); grid.innerHTML = filtered.map(cardHTML).join('');
             }
 
             tabs.forEach(function (tab) {

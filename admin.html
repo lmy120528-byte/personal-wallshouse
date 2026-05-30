@@ -493,8 +493,9 @@
                 'var articles = ['
             ];
 
-            var geoArticles = allArticles.filter(function(a) { return a.series === 'geo'; });
-            var aiArticles = allArticles.filter(function(a) { return a.series === 'ai'; });
+            var sortByDate = function(a, b) { return b.date.localeCompare(a.date); };
+            var geoArticles = allArticles.filter(function(a) { return a.series === 'geo'; }).sort(sortByDate);
+            var aiArticles = allArticles.filter(function(a) { return a.series === 'ai'; }).sort(sortByDate);
 
             function writeGroup(label, group, isLast) {
                 if (group.length === 0) return;

@@ -365,7 +365,8 @@
                 if (filter) {
                     filtered = articles.filter(function (a) { return a.series === filter; });
                 }
-                // 首页取前 6 篇
+                // 按日期倒序，首页取前 6 篇
+                filtered.sort(function (a, b) { return b.date.localeCompare(a.date); });
                 var show = filtered.slice(0, 6);
                 grid.innerHTML = show.map(cardHTML).join('');
             }
