@@ -76,6 +76,17 @@ var articles = [
     {
         series: 'ai',
         seriesName: '白话 AI',
+        title: 'Agent 概念祛魅：从 MCP 到 Harness，所有术语背后的本质逻辑',
+        date: '2026-05-31',
+        summary: 'AI Agent领域所有概念（Prompt工程、Function Calling、MCP、工作流、Skill、Harness工程）本质上是解决“降低人类参与度”这一主线问题的阶段性方案，核心在于用工程化手段驾驭大模型智能。',
+        wordCount: 2600,
+        readingTime: 10,
+        tags: ["AI Agent","Harness工程"],
+        url: 'https://mp.weixin.qq.com/s/8GvVjCCnv1PyuTqmgCMnmA'
+    },
+    {
+        series: 'ai',
+        seriesName: '白话 AI',
         title: '用户研究中的定量与定性',
         date: '2026-05-03',
         summary: '用户研究方法分为定性研究（解决“怎么想”）和定量研究（解决“怎么做”），两者可结合验证，如用户访谈与A/B测试的配合。',
