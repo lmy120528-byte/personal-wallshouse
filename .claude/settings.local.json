@@ -9,7 +9,17 @@
       "Bash(open http://localhost:8080/projects.html)",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "WebFetch(domain:www.pmyangkun.com)",
+      "WebFetch(domain:mp.weixin.qq.com)",
+      "Bash(open http://localhost:8080/articles.html)",
+      "Bash(curl -s http://localhost:8080/articles-data.js)",
+      "Bash(curl -s http://localhost:8080/)",
+      "Bash(curl -s http://localhost:8080/index.html)",
+      "Read(//tmp/**)",
+      "Bash(open \"http://localhost:8080/admin.html\")",
+      "Bash(curl -s -X POST http://localhost:8081/analyze -H 'Content-Type: application/json' -d '{\"api_key\":\"sk-ec4c3a47bd664366a9345b61c8257cd8\",\"model\":\"deepseek-chat\",\"max_tokens\":50,\"messages\":[{\"role\":\"user\",\"content\":\"say hello\"}]}')",
+      "Bash(curl -s https://raw.githubusercontent.com/lmy120528-byte/personal-wallshouse/main/articles-data.js)"
     ]
   }
 }

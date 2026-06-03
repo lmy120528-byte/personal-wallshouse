@@ -24,6 +24,15 @@
         }
         .admin-title { font-size: 17px; font-weight: 700; letter-spacing: 0.5px; }
         .admin-title span { color: var(--accent); }
+        .admin-tabs { display: flex; gap: 8px; margin-left: 32px; }
+        .admin-tab {
+            font-size: 13px; padding: 6px 16px; border-radius: 8px;
+            border: 1px solid var(--border); background: transparent;
+            color: var(--text-muted); cursor: pointer; font-family: inherit;
+            transition: all 0.2s ease; letter-spacing: 0.3px;
+        }
+        .admin-tab:hover { border-color: rgba(255,255,255,0.25); color: #ccc; }
+        .admin-tab.active { background: rgba(94,234,212,0.1); border-color: var(--accent); color: var(--accent); }
         .btn {
             font-size: 13px; padding: 8px 18px; border-radius: 8px; border: 1px solid var(--border);
             cursor: pointer; font-family: inherit; transition: all 0.2s ease;
@@ -98,6 +107,46 @@
         .toast.error { border-color: rgba(248,113,113,0.3); }
         .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* 日志模块 */
+        .log-day { margin-bottom: 28px; }
+        .log-day-header { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+        .log-day-header .log-count { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+        .log-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; margin-bottom: 10px; transition: border-color 0.2s ease; }
+        .log-item:hover { border-color: rgba(255,255,255,0.14); }
+        .log-meta { display: flex; gap: 16px; font-size: 11px; color: var(--text-muted); margin-bottom: 8px; align-items: center; }
+        .log-ip { color: rgba(94,234,212,0.5); }
+        .log-q { color: #ccc; font-size: 13px; margin-bottom: 8px; line-height: 1.6; }
+        .log-q span { color: var(--accent); font-weight: 600; margin-right: 6px; font-size: 11px; }
+        .log-a { color: var(--text-muted); font-size: 13px; line-height: 1.7; padding-left: 12px; border-left: 2px solid rgba(94,234,212,0.15); }
+        .log-sources { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
+        .log-src { font-size: 10px; padding: 2px 8px; border-radius: 100px; background: rgba(255,255,255,0.04); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.06); }
+
+        /* 会话卡片 */
+        .session-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 14px; overflow: hidden; transition: border-color 0.2s ease; }
+        .session-card:hover { border-color: rgba(255,255,255,0.14); }
+        .session-card-header {
+            padding: 12px 20px; background: rgba(255,255,255,0.02);
+            border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; user-select: none;
+        }
+        .session-card-header:hover { background: rgba(255,255,255,0.04); }
+        .session-card-title { font-size: 13px; font-weight: 600; color: var(--text); }
+        .session-card-meta { font-size: 11px; color: var(--text-muted); display: flex; gap: 14px; align-items: center; }
+        .session-card-body { padding: 16px 20px; }
+        .session-turn { padding: 12px 0; }
+        .session-turn + .session-turn { border-top: 1px solid rgba(255,255,255,0.04); }
+        .session-turn-q { color: #ccc; font-size: 13px; line-height: 1.6; margin-bottom: 8px; }
+        .session-turn-a { color: var(--text-muted); font-size: 13px; line-height: 1.7; padding-left: 12px; border-left: 2px solid rgba(94,234,212,0.15); }
+        .session-turn-time { font-size: 10px; color: var(--text-muted); opacity: 0.5; margin-bottom: 6px; }
+        .session-toggle { font-size: 11px; color: var(--accent); transition: transform 0.2s ease; }
+        .session-card.collapsed .session-card-body { display: none; }
+        .session-card.collapsed .session-toggle { transform: rotate(-90deg); }
+        .log-empty { text-align: center; color: var(--text-muted); padding: 48px 20px; font-size: 14px; }
+        .log-empty a { color: var(--accent); }
+        .logs-toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; }
+        .logs-toolbar .log-api-hint { font-size: 11px; color: var(--text-muted); margin-left: auto; }
         @media (max-width: 640px) {
             .form-row { grid-template-columns: 1fr; }
             .settings-bar { flex-direction: column; align-items: stretch; }
@@ -108,13 +157,21 @@
 </head>
 <body>
     <header class="admin-header">
-        <div class="admin-title">文章管理工具 <span>·</span> Admin</div>
+        <div class="admin-title">管理后台 <span>·</span> Admin</div>
+        <div class="admin-tabs">
+            <button class="admin-tab active" id="tabArticles" onclick="switchTab('articles')">文章管理</button>
+            <button class="admin-tab" id="tabLogs" onclick="switchTab('logs')">Agent 会话记录</button>
+            <button class="admin-tab" id="tabPrompt" onclick="switchTab('prompt')">System Prompt</button>
+        </div>
         <div class="header-actions">
             <button class="btn btn-outline btn-sm" onclick="toggleSettings()">⚙ 设置</button>
         </div>
     </header>
 
     <div class="container">
+
+        <!-- ====== 文章管理 ====== -->
+        <div id="sectionArticles">
         <!-- 设置面板 -->
         <div class="settings-bar" id="settingsPanel" style="">
             <label>DeepSeek Key</label>
@@ -164,9 +221,42 @@
                 overflow-y:auto; color:var(--text-muted);
             "></pre>
         </div>
+    </div>  <!-- /sectionArticles -->
+
+    <!-- ====== System Prompt 编辑 ====== -->
+    <div id="sectionPrompt" style="display:none;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+            <button class="btn btn-outline btn-sm" onclick="loadPrompt()">🔄 加载当前</button>
+            <button class="btn btn-primary btn-sm" id="btnSavePrompt" onclick="savePrompt()">💾 保存生效</button>
+            <span id="promptStatus" style="font-size:11px; color:var(--text-muted);"></span>
+        </div>
+        <textarea id="promptEditor" style="
+            width:100%; min-height:500px; background:var(--bg-card);
+            border:1px solid var(--border); border-radius:10px;
+            padding:20px; color:var(--text); font-size:13px;
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', monospace;
+            line-height:1.7; resize:vertical;
+            transition: border-color 0.2s ease;
+        " placeholder="加载中..."></textarea>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:8px;">
+            保存后立即生效，无需重启。编辑时注意保持 Markdown 格式。
+        </div>
     </div>
 
-    <div class="toast" id="toast"></div>
+    <!-- ====== Agent 会话记录 ====== -->
+    <div id="sectionLogs" style="display:none;">
+        <div class="logs-toolbar">
+            <button class="btn btn-outline btn-sm" onclick="loadLogs()">🔄 刷新</button>
+            <span class="log-api-hint">数据来自 rag-backend/chat_logs.jsonl</span>
+        </div>
+        <div id="logsContainer">
+            <div class="log-empty">加载中...</div>
+        </div>
+    </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
 
     <script>
         // ===== 全局状态 =====
@@ -679,6 +769,183 @@
         });
 
         init();
+
+        // ===== Tab 切换 =====
+        var currentTab = 'articles';
+        window.switchTab = function(tab) {
+            currentTab = tab;
+            document.getElementById('tabArticles').classList.toggle('active', tab === 'articles');
+            document.getElementById('tabLogs').classList.toggle('active', tab === 'logs');
+            document.getElementById('tabPrompt').classList.toggle('active', tab === 'prompt');
+            document.getElementById('sectionArticles').style.display = tab === 'articles' ? '' : 'none';
+            document.getElementById('sectionLogs').style.display = tab === 'logs' ? '' : 'none';
+            document.getElementById('sectionPrompt').style.display = tab === 'prompt' ? '' : 'none';
+            if (tab === 'logs') loadLogs();
+            if (tab === 'prompt') loadPrompt();
+        };
+
+        // ===== System Prompt 编辑 =====
+        window.loadPrompt = function() {
+            var editor = document.getElementById('promptEditor');
+            var status = document.getElementById('promptStatus');
+            editor.value = '加载中...';
+            status.textContent = '';
+            fetch('http://localhost:8000/system-prompt')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    editor.value = data.content;
+                    status.textContent = '已加载 (' + data.content.length + ' 字)';
+                })
+                .catch(function(err) {
+                    editor.value = '加载失败：' + err.message + '\n\n请确认后端已启动（python3 rag-backend/main.py）';
+                    status.textContent = '加载失败';
+                });
+        };
+
+        window.savePrompt = function() {
+            var editor = document.getElementById('promptEditor');
+            var status = document.getElementById('promptStatus');
+            var btn = document.getElementById('btnSavePrompt');
+            var content = editor.value.trim();
+            if (!content) { showToast('内容不能为空', 'error'); return; }
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> 保存中...';
+            fetch('http://localhost:8000/system-prompt', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: content })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                status.textContent = '✅ 已保存生效 (' + content.length + ' 字)';
+                showToast('System Prompt 已更新，Agent 立即生效', 'success');
+            })
+            .catch(function(err) {
+                status.textContent = '保存失败: ' + err.message;
+            })
+            .finally(function() {
+                btn.disabled = false;
+                btn.innerHTML = '💾 保存生效';
+            });
+        };
+
+        // ===== 加载会话日志 =====
+        window.loadLogs = function() {
+            var container = document.getElementById('logsContainer');
+            container.innerHTML = '<div class="log-empty"><span class="spinner"></span> 加载中...</div>';
+
+            fetch('http://localhost:8000/chat/logs?limit=200')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (!data.logs || data.logs.length === 0) {
+                        container.innerHTML = '<div class="log-empty">暂无会话记录。<br><br>有人在网站上通过数字分身聊天后，记录会出现在这里。</div>';
+                        return;
+                    }
+                    renderLogs(data.logs);
+                })
+                .catch(function(err) {
+                    container.innerHTML = '<div class="log-empty">加载失败：' + err.message + '<br><br>请确认后端已启动（python3 rag-backend/main.py）</div>';
+                });
+        };
+
+        function renderLogs(logs) {
+            var container = document.getElementById('logsContainer');
+
+            // 第一步：按 session 分组
+            var sessions = {};
+            logs.forEach(function(log) {
+                var sid = log.session;
+                if (!sessions[sid]) sessions[sid] = [];
+                sessions[sid].push(log);
+            });
+
+            // 第二步：每个 session 内的消息按时间排序
+            Object.keys(sessions).forEach(function(sid) {
+                sessions[sid].sort(function(a, b) { return a.time.localeCompare(b.time); });
+            });
+
+            // 第三步：获取 session 日期（取第一条消息的日期）
+            var sessionList = [];
+            Object.keys(sessions).forEach(function(sid) {
+                var msgs = sessions[sid];
+                sessionList.push({
+                    id: sid,
+                    day: msgs[0].time.substring(0, 10),
+                    firstTime: msgs[0].time,
+                    ip: msgs[0].ip,
+                    turns: msgs.length,
+                    msgs: msgs
+                });
+            });
+
+            // 按时间倒序
+            sessionList.sort(function(a, b) { return b.firstTime.localeCompare(a.firstTime); });
+
+            // 按日期分组
+            var dayGroups = {};
+            sessionList.forEach(function(sess) {
+                if (!dayGroups[sess.day]) dayGroups[sess.day] = [];
+                dayGroups[sess.day].push(sess);
+            });
+
+            var days = Object.keys(dayGroups).sort().reverse();
+
+            var html = '';
+            days.forEach(function(day) {
+                var sessions = dayGroups[day];
+                html += '<div class="log-day">';
+                html += '<div class="log-day-header">' + day + ' <span class="log-count">' + sessions.length + ' 个会话</span></div>';
+
+                sessions.forEach(function(sess, idx) {
+                    // 用第一条 Q 做标题，截取前 25 字
+                    var firstQ = '';
+                    for (var j = 0; j < sess.msgs.length; j++) {
+                        if (sess.msgs[j].question) { firstQ = sess.msgs[j].question; break; }
+                    }
+                    var title = firstQ ? firstQ.substring(0, 25) + (firstQ.length > 25 ? '...' : '') : '会话';
+
+                    html += '<div class="session-card' + (idx > 0 ? ' collapsed' : '') + '">';
+                    html += '<div class="session-card-header" onclick="toggleSession(this)">';
+                    html += '<div>';
+                    html += '<div class="session-card-title">' + safeHtml(title) + '</div>';
+                    html += '<div class="session-card-meta">';
+                    html += '<span>' + sess.firstTime.substring(11, 16) + '</span>';
+                    html += '<span class="log-ip">' + safeHtml(sess.ip) + '</span>';
+                    html += '<span>' + sess.turns + ' 轮对话</span>';
+                    html += '</div></div>';
+                    html += '<div class="session-toggle">▼</div>';
+                    html += '</div>';
+
+                    html += '<div class="session-card-body">';
+                    sess.msgs.forEach(function(msg) {
+                        html += '<div class="session-turn">';
+                        html += '<div class="session-turn-time">' + msg.time.substring(11, 16) + '</div>';
+                        html += '<div class="session-turn-q"><span style="color:var(--accent);font-weight:600;font-size:11px;margin-right:6px;">Q</span>' + safeHtml(msg.question) + '</div>';
+                        html += '<div class="session-turn-a">' + safeHtml(msg.answer).replace(/\n/g, '<br>') + '</div>';
+                        if (msg.sources && msg.sources.length > 0) {
+                            html += '<div class="log-sources">' +
+                                msg.sources.map(function(s) { return '<span class="log-src">' + safeHtml(s) + '</span>'; }).join('') +
+                                '</div>';
+                        }
+                        html += '</div>';
+                    });
+                    html += '</div>';
+                    html += '</div>';
+                });
+
+                html += '</div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        window.toggleSession = function(header) {
+            header.parentElement.classList.toggle('collapsed');
+        };
+
+        function safeHtml(str) {
+            return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
     </script>
 </body>
 </html>

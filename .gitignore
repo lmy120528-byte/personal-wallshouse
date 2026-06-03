@@ -1,1 +1,8 @@
 .DS_Store
+# RAG 后端
+rag-backend/chroma_data/
+rag-backend/chat_logs.jsonl
+rag-backend/__pycache__/
+rag-backend/*.pyc
+# 本地配置
+.claude/settings.local.json

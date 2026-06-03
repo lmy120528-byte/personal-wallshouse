@@ -21,7 +21,7 @@
             <a href="projects.html">项目经历</a>
             <a href="articles.html">文章</a>
             <a href="#contact">联系</a>
-            <a class="nav-agent-btn" href="javascript:void(0)">数字分身</a>
+            <a class="nav-agent-btn" href="javascript:void(0)" id="btnOpenChat">数字分身</a>
         </div>
     </nav>
 
@@ -441,6 +441,366 @@
             // 初始渲染（全部）
             render(null);
         })();
+    </script>
+
+    <!-- ===== 数字分身抽屉 ===== -->
+    <!-- 遮罩层 -->
+    <div class="chat-drawer-overlay" id="chatOverlay"></div>
+
+    <!-- 抽屉本体 -->
+    <div class="chat-drawer" id="chatDrawer">
+        <!-- 头部 -->
+        <div class="chat-drawer-header">
+            <div class="chat-drawer-header-left">
+                <div class="chat-drawer-avatar">强</div>
+                <div>
+                    <div class="chat-drawer-title">张强的数字分身</div>
+                    <div class="chat-drawer-subtitle">基于真实经历和思考回答</div>
+                </div>
+            </div>
+            <button class="chat-drawer-close" id="btnNewChat" style="margin-right:8px; width:auto; padding:0 14px; font-size:12px; font-weight:500;">新会话</button>
+            <button class="chat-drawer-close" id="btnCloseChat">✕</button>
+        </div>
+
+        <!-- 消息区 -->
+        <div class="chat-drawer-messages" id="chatMessages">
+            <div class="msg agent">
+                <div class="msg-avatar">强</div>
+                <div>
+                    <div class="msg-bubble">
+                        你好，我是张强的数字分身。<br><br>
+                        你可以直接问我任何问题：<br>
+                        • "你怎么看 GEO 的未来？"<br>
+                        • "讲讲你在百度做过的项目"<br>
+                        • "RAG 技术是什么？有什么缺陷？"
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 输入区 -->
+        <div class="chat-drawer-input-area">
+            <div class="chat-drawer-input-wrap">
+                <textarea id="chatInput" placeholder="输入你的问题..."
+                    onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+                <button class="chat-drawer-send-btn" id="btnSendChat" onclick="sendChat()">→</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== 数字分身聊天逻辑 =====
+        (function() {
+            var API_URL = 'http://localhost:8000/chat';
+            var DEFAULT_KEY = localStorage.getItem('deepseek_key') || '';
+            var STORAGE_KEY = 'chat_sessions';
+            var CURRENT_SESSION_KEY = 'chat_current_session';
+            var sessionId = null;
+            var sessions = {};
+
+            // ---- DOM 引用 ----
+            var overlay  = document.getElementById('chatOverlay');
+            var drawer   = document.getElementById('chatDrawer');
+            var messages = document.getElementById('chatMessages');
+            var input    = document.getElementById('chatInput');
+            var sendBtn  = document.getElementById('btnSendChat');
+
+            // ---- 会话持久化 ----
+            function loadSessions() {
+                try { var raw = localStorage.getItem(STORAGE_KEY); sessions = raw ? JSON.parse(raw) : {}; }
+                catch(e) { sessions = {}; }
+            }
+            function saveSessions() {
+                try { localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions)); } catch(e) {}
+            }
+
+            function persistCurrentSession() {
+                if (!sessionId) return;
+                var msgs = [];
+                var children = messages.children;
+                for (var i = 0; i < children.length; i++) {
+                    var el = children[i];
+                    if (el.classList.contains('thinking') || el.classList.contains('msg-divider')) continue;
+                    var role = el.classList.contains('user') ? 'user' : 'agent';
+                    var bubble = el.querySelector('.msg-bubble');
+                    if (!bubble) continue;
+                    var text = bubble.innerHTML
+                        .replace(/<p>/g, '\n\n').replace(/<\/p>/g, '')
+                        .replace(/<br>/g, '\n')
+                        .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                    var srcEls = el.querySelectorAll('.src-chip');
+                    var sources = [];
+                    srcEls.forEach(function(s) { sources.push(s.textContent); });
+                    msgs.push({ role: role, text: text.trim(), sources: sources });
+                }
+                if (msgs.length > 0) {
+                    var title = '';
+                    for (var j = 0; j < msgs.length; j++) {
+                        if (msgs[j].role === 'user') { title = msgs[j].text.substring(0, 30); break; }
+                    }
+                    sessions[sessionId] = { title: title, msgs: msgs, time: Date.now() };
+                } else {
+                    delete sessions[sessionId];
+                }
+                saveSessions();
+            }
+
+            function restoreMessages(msgs) {
+                messages.innerHTML = '';
+                msgs.forEach(function(m) { appendMsg(m.role, m.text, m.sources, true); });
+                if (msgs.length === 0) showWelcome();
+            }
+
+            function showWelcome() {
+                messages.innerHTML = '';
+                var el = document.createElement('div');
+                el.className = 'msg agent';
+                el.innerHTML = '<div class="msg-avatar">强</div>' +
+                    '<div><div class="msg-bubble">' +
+                    '你好，我是张强的数字分身。<br><br>' +
+                    '你可以直接问我任何问题：<br>' +
+                    '• "你怎么看 GEO 的未来？"<br>' +
+                    '• "讲讲你在百度做过的项目"<br>' +
+                    '• "RAG 技术是什么？有什么缺陷？"' +
+                    '</div></div>';
+                messages.appendChild(el);
+            }
+
+            function initSession() {
+                loadSessions();
+                var saved = localStorage.getItem(CURRENT_SESSION_KEY);
+                if (saved && sessions[saved]) {
+                    sessionId = saved;
+                    restoreMessages(sessions[saved].msgs);
+                } else {
+                    startNewSession(false);
+                }
+            }
+
+            function startNewSession(addDivider) {
+                if (sessionId && addDivider !== false) {
+                    persistCurrentSession();
+                    var div = document.createElement('div');
+                    div.className = 'msg-divider';
+                    div.style.cssText = 'text-align:center;padding:12px 0;font-size:11px;color:var(--text-muted);opacity:0.5;';
+                    div.innerHTML = '<span style="display:inline-block;border-top:1px solid rgba(255,255,255,0.08);width:100%;position:relative;top:-7px;"></span>' +
+                        '<span style="position:relative;background:#0d0d0d;padding:0 12px;">↑ 以下为新会话</span>';
+                    messages.appendChild(div);
+                    scrollChat();
+                }
+                sessionId = 'sess-' + Date.now();
+                localStorage.setItem(CURRENT_SESSION_KEY, sessionId);
+                sessions[sessionId] = { title: '', msgs: [], time: Date.now() };
+                saveSessions();
+                if (addDivider === false) showWelcome();
+            }
+
+            // ---- Key 管理 ----
+            function getKey() {
+                // 优先从 localStorage 读取，没有则提示设置
+                var stored = localStorage.getItem('deepseek_key');
+                if (stored) return stored;
+                if (DEFAULT_KEY) {
+                    localStorage.setItem('deepseek_key', DEFAULT_KEY);
+                    return DEFAULT_KEY;
+                }
+                return '';
+            }
+
+            // ---- 开关抽屉 ----
+            function openChat() {
+                overlay.classList.add('open');
+                drawer.classList.add('open');
+                document.body.style.overflow = 'hidden';
+                setTimeout(function() { input.focus(); }, 400);
+            }
+
+            function closeChat() {
+                overlay.classList.remove('open');
+                drawer.classList.remove('open');
+                document.body.style.overflow = '';
+                persistCurrentSession();
+            }
+
+            document.getElementById('btnOpenChat').addEventListener('click', openChat);
+            document.getElementById('btnCloseChat').addEventListener('click', closeChat);
+            overlay.addEventListener('click', closeChat);
+
+            // 新会话按钮
+            document.getElementById('btnNewChat').addEventListener('click', function(e) {
+                e.stopPropagation();
+                startNewSession(true);
+            });
+
+            // ESC 关闭
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && drawer.classList.contains('open')) closeChat();
+            });
+
+            // 页面关闭前保存
+            window.addEventListener('beforeunload', function() { persistCurrentSession(); });
+
+            // ---- 发送消息 ----
+            window.sendChat = function() {
+                var text = input.value.trim();
+                if (!text) return;
+                var key = getKey();
+
+                // 用户消息
+                appendMsg('user', text);
+                input.value = '';
+                input.style.height = 'auto';
+
+                // 创建空的 agent 消息气泡（用于逐字填充）
+                var agentEl = createStreamBubble();
+                var bubbleEl = agentEl.querySelector('.msg-bubble');
+                var sources = [];
+
+                // 禁用输入
+                sendBtn.disabled = true;
+                input.disabled = true;
+
+                // 请求流式接口
+                fetch(API_URL.replace('/chat', '/chat/stream'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text, session_id: sessionId, deepseek_key: key })
+                })
+                .then(function(resp) {
+                    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                    return streamResponse(resp, function(chunk, type) {
+                        if (type === 'content') {
+                            // 逐字追加到气泡
+                            bubbleEl.innerHTML += chunk
+                                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                                .replace(/\n\n/g, '<br><br>')
+                                .replace(/\n/g, '<br>');
+                            scrollChat();
+                        } else if (type === 'sources') {
+                            sources = chunk;
+                        }
+                    });
+                })
+                .then(function(fullText) {
+                    // 流结束，添加来源
+                    if (sources.length > 0) {
+                        var srcHtml = '<div class="msg-sources">参考 ' +
+                            sources.map(function(s) { return '<span class="src-chip">' + s + '</span>'; }).join('') + '</div>';
+                        agentEl.querySelector('.msg-body').insertAdjacentHTML('beforeend', srcHtml);
+                    }
+                    sendBtn.disabled = false;
+                    input.disabled = false;
+                    input.focus();
+                    scrollChat();
+                    persistCurrentSession();
+                })
+                .catch(function(err) {
+                    bubbleEl.innerHTML = '连接失败，请确认后端已启动。\n错误：' + err.message;
+                    sendBtn.disabled = false;
+                    input.disabled = false;
+                    input.focus();
+                    scrollChat();
+                    persistCurrentSession();
+                });
+                scrollChat();
+            };
+
+            // 读取 SSE 流
+            function streamResponse(resp, onChunk) {
+                var reader = resp.body.getReader();
+                var decoder = new TextDecoder();
+                var buffer = '';
+                var fullText = '';
+
+                function pump() {
+                    return reader.read().then(function(result) {
+                        if (result.done) return fullText;
+
+                        buffer += decoder.decode(result.value, { stream: true });
+
+                        // 解析 SSE 行
+                        var lines = buffer.split('\n');
+                        buffer = lines.pop() || '';  // 保留不完整的最后一行
+
+                        for (var i = 0; i < lines.length; i++) {
+                            var line = lines[i].trim();
+                            if (!line.startsWith('data: ')) continue;
+                            var data = line.substring(6);
+                            if (data === '[DONE]') continue;
+
+                            try {
+                                var obj = JSON.parse(data);
+                                if (obj.type === 'content') {
+                                    fullText += obj.content;
+                                    onChunk(obj.content, 'content');
+                                } else if (obj.type === 'sources') {
+                                    onChunk(obj.sources, 'sources');
+                                } else if (obj.type === 'error') {
+                                    throw new Error(obj.error);
+                                }
+                            } catch(e) {
+                                if (e.message && e.message.indexOf('SyntaxError') === -1) throw e;
+                            }
+                        }
+                        return pump();
+                    });
+                }
+                return pump();
+            }
+
+            // 创建空的流式消息气泡
+            function createStreamBubble() {
+                var el = document.createElement('div');
+                el.className = 'msg agent';
+                el.innerHTML = '<div class="msg-avatar">强</div>' +
+                    '<div class="msg-body"><div class="msg-bubble" style="min-height:20px;"></div></div>';
+                messages.appendChild(el);
+                return el;
+            }
+
+            // ---- 消息渲染 ----
+            function appendMsg(role, text, sources, isRestore) {
+                var el = document.createElement('div');
+                el.className = 'msg ' + role;
+                var avatar = role === 'user' ? '我' : '强';
+                var html = text
+                    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                    .replace(/\n\n/g, '</p><p>')
+                    .replace(/\n/g, '<br>');
+                html = '<p>' + html + '</p>';
+                var srcHtml = '';
+                if (sources && sources.length > 0) {
+                    srcHtml = '<div class="msg-sources">参考 ' +
+                        sources.map(function(s) { return '<span class="src-chip">' + s + '</span>'; }).join('') + '</div>';
+                }
+                el.innerHTML = '<div class="msg-avatar">' + avatar + '</div>' +
+                    '<div class="msg-body"><div class="msg-bubble">' + html + '</div>' + srcHtml + '</div>';
+                messages.appendChild(el);
+                if (!isRestore) scrollChat();
+            }
+
+            function appendThinking() {
+                var el = document.createElement('div');
+                el.className = 'msg agent thinking';
+                el.innerHTML = '<div class="msg-avatar">强</div>' +
+                    '<div class="msg-bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
+                messages.appendChild(el);
+                scrollChat();
+                return el;
+            }
+
+            function scrollChat() {
+                setTimeout(function() { messages.scrollTop = messages.scrollHeight; }, 50);
+            }
+
+            input.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+            });
+
+            initSession();
+        })();
+
     </script>
 </body>
 </html>
