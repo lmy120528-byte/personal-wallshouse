@@ -76,6 +76,17 @@ var articles = [
     {
         series: 'ai',
         seriesName: '白话 AI',
+        title: 'RAG是什么·有什么用途',
+        date: '2026-06-05',
+        summary: 'RAG（检索增强生成）通过检索外部文档辅助大模型回答，解决知识固化、幻觉和领域专业性问题，核心流程包括文档切片、向量化、存储和检索。',
+        wordCount: 2200,
+        readingTime: 9,
+        tags: ["RAG技术","文档切片策略"],
+        url: 'https://mp.weixin.qq.com/s/NBX1D4V4y6fNZ-xjvLm_Xw'
+    },
+    {
+        series: 'ai',
+        seriesName: '白话 AI',
         title: 'Agent 概念祛魅：从 MCP 到 Harness，所有术语背后的本质逻辑',
         date: '2026-05-31',
         summary: 'AI Agent领域所有概念（Prompt工程、Function Calling、MCP、工作流、Skill、Harness工程）本质上是解决“降低人类参与度”这一主线问题的阶段性方案，核心在于用工程化手段驾驭大模型智能。',
