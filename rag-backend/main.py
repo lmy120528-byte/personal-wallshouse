@@ -95,8 +95,19 @@ try:
     collection = chroma_client.get_collection(name=COLLECTION_NAME)
     print(f"   ✅ 知识库就绪（{collection.count()} 个切片）")
 except Exception:
-    print("   ⚠️  知识库为空！请先运行 python3 ingest.py")
-    collection = None
+    print("   ⚠️  知识库为空，自动构建中...")
+    # 部署环境首次启动：自动运行 ingest 构建知识库
+    import subprocess, sys
+    result = subprocess.run(
+        [sys.executable, os.path.join(os.path.dirname(__file__), "ingest.py")],
+        capture_output=True, text=True, cwd=os.path.dirname(__file__)
+    )
+    if result.returncode == 0:
+        collection = chroma_client.get_collection(name=COLLECTION_NAME)
+        print(f"   ✅ 自动构建完成（{collection.count()} 个切片）")
+    else:
+        print(f"   ❌ 自动构建失败: {result.stderr[:200]}")
+        collection = None
 
 # ============================================================
 # FastAPI 应用
@@ -438,10 +449,11 @@ def view_logs(limit: int = 50):
 # ============================================================
 if __name__ == "__main__":
     import uvicorn
+    port = int(os.environ.get("PORT", 8000))
     print("\n" + "=" * 60)
     print("🏠 张强数字分身 API 启动")
-    print(f"   地址: http://localhost:8000")
-    print(f"   文档: http://localhost:8000/docs")
-    print(f"   聊天: POST http://localhost:8000/chat")
+    print(f"   地址: http://0.0.0.0:{port}")
+    print(f"   文档: http://0.0.0.0:{port}/docs")
+    print(f"   聊天: POST http://0.0.0.0:{port}/chat")
     print("=" * 60 + "\n")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=port)
