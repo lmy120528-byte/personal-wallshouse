@@ -292,10 +292,11 @@
             var hasDs = !!document.getElementById('deepseekKey').value.trim();
             var gs = document.getElementById('githubStatus');
             var ds = document.getElementById('deepseekStatus');
-            gs.textContent = hasGh ? '已设置 OK' : '未设置';
-            gs.className = 'settings-status ' + (hasGh ? 'ok' : 'missing');
-            ds.textContent = hasDs ? '已设置 OK' : '未设置';
-            ds.className = 'settings-status ' + (hasDs ? 'ok' : 'missing');
+            // GitHub Token 和 DeepSeek Key 均可由 proxy 服务端环境变量提供，前端不填也能用
+            gs.textContent = hasGh ? '前端已设' : '走代理';
+            gs.className = 'settings-status ' + (hasGh ? 'ok' : '');
+            ds.textContent = hasDs ? '前端已设' : '走代理';
+            ds.className = 'settings-status ' + (hasDs ? 'ok' : '');
         }
 
         function getGitHubToken() { return document.getElementById('githubToken').value.trim(); }
@@ -418,8 +419,7 @@
 
         // 调用 DeepSeek API（兼容 OpenAI 格式）
         async function callDeepSeekAPI(articles) {
-            var apiKey = getDeepSeekKey();
-            if (!apiKey) throw new Error('未设置 DeepSeek API Key，请在设置中填入');
+            var apiKey = getDeepSeekKey();  // 未设置时留空，proxy 会自动用环境变量
 
             // 只分析有内容的文章
             var toAnalyze = articles.filter(function(a) { return a.content.length > 0; });
@@ -621,14 +621,7 @@
 
         // ===== GitHub 推送 =====
         async function deployToGitHub() {
-            var token = getGitHubToken();
-            if (!token) {
-                showToast('请先在设置中填写 GitHub Token', 'error');
-                toggleSettings();
-                document.getElementById('settingsPanel').scrollIntoView({ behavior: 'smooth' });
-                return;
-            }
-
+            // 通过 proxy 读取本地文件 → 合并 → git push（SSH 免 Token）
             var newArticles = collectFinalArticles();
             if (newArticles.length === 0) { showToast('请添加有效的文章数据', 'error'); return; }
 
@@ -651,77 +644,46 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span> 推送中...';
 
-            var owner = 'lmy120528-byte';
-            var repo = 'personal-wallshouse';
-            var path = 'articles-data.js';
-
             try {
+                // 1. 读取现有文章（通过 proxy 读本地文件）
                 document.getElementById('actionHint').textContent = '读取现有数据...';
-                var getResp = await fetch('https://api.github.com/repos/' + owner + '/' + repo + '/contents/' + path, {
-                    headers: {
-                        'Authorization': 'token ' + token,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                });
+                var readResp = await fetch('http://localhost:8081/read-articles', { method: 'POST' });
+                if (!readResp.ok) throw new Error('读取文章失败: ' + readResp.status);
+                var readData = await readResp.json();
 
                 var existingArticles = [];
-                var sha = null;
-
-                if (getResp.ok) {
-                    var fileData = await getResp.json();
-                    sha = fileData.sha;
-                    var rawContent = decodeURIComponent(escape(atob(fileData.content)));
-                    existingArticles = parseExistingArticles(rawContent);
-                    document.getElementById('actionHint').textContent = '现有 ' + existingArticles.length + ' 篇 + 新增 ' + newArticles.length + ' 篇';
-                } else {
-                    document.getElementById('actionHint').textContent = '新建文件，共 ' + newArticles.length + ' 篇文章';
+                if (readData.raw) {
+                    existingArticles = parseExistingArticles(readData.raw);
                 }
+                document.getElementById('actionHint').textContent = '现有 ' + existingArticles.length + ' 篇 + 新增 ' + newArticles.length + ' 篇';
 
-                // 合并（新文章在前）
+                // 2. 合并（新文章在前）
                 var allArticles = newArticles.concat(existingArticles);
                 var newContent = generateDataFile(allArticles);
 
-                // 显示预览
+                // 3. 显示预览
                 document.getElementById('previewSection').style.display = 'block';
                 document.getElementById('previewContent').textContent = newContent;
                 document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
 
-                // 推送
+                // 4. 部署：通过 proxy 写文件 + git push
                 document.getElementById('actionHint').textContent = '推送到 GitHub...';
-                var putBody = {
-                    message: '新增文章: ' + newArticles.map(function(a) { return a.title; }).join(', '),
-                    content: btoa(unescape(encodeURIComponent(newContent)))
-                };
-                if (sha) putBody.sha = sha;
-
-                var putResp = await fetch('https://api.github.com/repos/' + owner + '/' + repo + '/contents/' + path, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': 'token ' + token,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/vnd.github.v3+json'
-                    },
-                    body: JSON.stringify(putBody)
+                var deployResp = await fetch('http://localhost:8081/deploy', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content: newContent,
+                        message: '新增文章: ' + newArticles.map(function(a) { return a.title; }).join(', ')
+                    })
                 });
 
-                if (putResp.ok) {
-                    // 自动同步本地文件
-                    try {
-                        var syncResp = await fetch('http://localhost:8081/git-pull', { method: 'POST' });
-                        var syncData = await syncResp.json();
-                        if (syncData.ok) {
-                            showToast('推送成功！本地已自动同步，刷新页面即可', 'success');
-                        } else {
-                            showToast('推送成功！但本地同步失败: ' + syncData.output, 'error');
-                        }
-                    } catch (syncErr) {
-                        showToast('推送成功！Vercel 自动部署中。本地需手动 git pull', 'success');
-                    }
-                    document.getElementById('actionHint').textContent = '完成！新增 ' + newArticles.length + ' 篇文章';
+                if (deployResp.ok) {
+                    showToast('推送成功！Vercel 自动部署中', 'success');
                 } else {
-                    var errData = await putResp.json();
-                    throw new Error(errData.message || '推送失败');
+                    var errData = await deployResp.json();
+                    throw new Error(errData.error || '推送失败');
                 }
+                document.getElementById('actionHint').textContent = '完成！新增 ' + newArticles.length + ' 篇文章';
             } catch (err) {
                 showToast('推送失败: ' + err.message, 'error');
             } finally {

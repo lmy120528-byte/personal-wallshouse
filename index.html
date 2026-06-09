@@ -492,7 +492,6 @@
         // ===== 数字分身聊天逻辑 =====
         (function() {
             var API_URL = 'http://localhost:8000/chat';
-            var DEFAULT_KEY = localStorage.getItem('deepseek_key') || '';
             var STORAGE_KEY = 'chat_sessions';
             var CURRENT_SESSION_KEY = 'chat_current_session';
             var sessionId = null;
@@ -595,18 +594,6 @@
                 if (addDivider === false) showWelcome();
             }
 
-            // ---- Key 管理 ----
-            function getKey() {
-                // 优先从 localStorage 读取，没有则提示设置
-                var stored = localStorage.getItem('deepseek_key');
-                if (stored) return stored;
-                if (DEFAULT_KEY) {
-                    localStorage.setItem('deepseek_key', DEFAULT_KEY);
-                    return DEFAULT_KEY;
-                }
-                return '';
-            }
-
             // ---- 开关抽屉 ----
             function openChat() {
                 overlay.classList.add('open');
@@ -644,7 +631,6 @@
             window.sendChat = function() {
                 var text = input.value.trim();
                 if (!text) return;
-                var key = getKey();
 
                 // 用户消息
                 appendMsg('user', text);
@@ -654,7 +640,17 @@
                 // 创建空的 agent 消息气泡（用于逐字填充）
                 var agentEl = createStreamBubble();
                 var bubbleEl = agentEl.querySelector('.msg-bubble');
+                var reasoningBox = agentEl.querySelector('.msg-reasoning');
+                var reasoningContent = agentEl.querySelector('.msg-reasoning-content');
                 var sources = [];
+
+                // 显示 loading 动效（三个跳动点）
+                bubbleEl.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
+                agentEl.classList.add('thinking');
+                scrollChat();
+
+                // 标记：首次收到数据时移除 loading
+                var firstChunk = true;
 
                 // 禁用输入
                 sendBtn.disabled = true;
@@ -664,16 +660,33 @@
                 fetch(API_URL.replace('/chat', '/chat/stream'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text, session_id: sessionId, deepseek_key: key })
+                    body: JSON.stringify({ message: text, session_id: sessionId })
                 })
                 .then(function(resp) {
                     if (!resp.ok) throw new Error('HTTP ' + resp.status);
                     return streamResponse(resp, function(chunk, type) {
+                        // 首次收到数据：清除 loading 动画
+                        if (firstChunk) {
+                            firstChunk = false;
+                            agentEl.classList.remove('thinking');
+                            bubbleEl.innerHTML = '';
+                        }
                         if (type === 'content') {
                             // 逐字追加到气泡
                             bubbleEl.innerHTML += chunk
                                 .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
                                 .replace(/\n\n/g, '<br><br>')
+                                .replace(/\n/g, '<br>');
+                            scrollChat();
+                        } else if (type === 'reasoning') {
+                            // 追加到思考过程，首次自动展开让用户看到活动
+                            reasoningBox.style.display = 'block';
+                            if (!reasoningBox.classList.contains('was-expanded')) {
+                                reasoningBox.classList.add('expanded', 'was-expanded');
+                                reasoningBox.querySelector('.reasoning-arrow').textContent = '▾';
+                            }
+                            reasoningContent.innerHTML += chunk
+                                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
                                 .replace(/\n/g, '<br>');
                             scrollChat();
                         } else if (type === 'sources') {
@@ -695,6 +708,7 @@
                     persistCurrentSession();
                 })
                 .catch(function(err) {
+                    agentEl.classList.remove('thinking');
                     bubbleEl.innerHTML = '连接失败，请确认后端已启动。\n错误：' + err.message;
                     sendBtn.disabled = false;
                     input.disabled = false;
@@ -733,9 +747,15 @@
                                 if (obj.type === 'content') {
                                     fullText += obj.content;
                                     onChunk(obj.content, 'content');
+                                } else if (obj.type === 'reasoning') {
+                                    // 思考过程：交给回调显示（首次会自动触发 clearLoading）
+                                    onChunk(obj.content, 'reasoning');
                                 } else if (obj.type === 'sources') {
                                     onChunk(obj.sources, 'sources');
                                 } else if (obj.type === 'error') {
+                                    throw new Error(obj.error);
+                                } else if (obj.error) {
+                                    // 兜底：兼容 {"error": "..."} 格式
                                     throw new Error(obj.error);
                                 }
                             } catch(e) {
@@ -753,10 +773,22 @@
                 var el = document.createElement('div');
                 el.className = 'msg agent';
                 el.innerHTML = '<div class="msg-avatar">强</div>' +
-                    '<div class="msg-body"><div class="msg-bubble" style="min-height:20px;"></div></div>';
+                    '<div class="msg-body">' +
+                    '<div class="msg-reasoning" style="display:none;">' +
+                    '<div class="msg-reasoning-header" onclick="toggleReasoning(this)">💭 思考过程 <span class="reasoning-arrow">▸</span></div>' +
+                    '<div class="msg-reasoning-content"></div>' +
+                    '</div>' +
+                    '<div class="msg-bubble" style="min-height:20px;"></div></div>';
                 messages.appendChild(el);
                 return el;
             }
+
+            window.toggleReasoning = function(header) {
+                var box = header.parentElement;
+                box.classList.toggle('expanded');
+                var arrow = header.querySelector('.reasoning-arrow');
+                arrow.textContent = box.classList.contains('expanded') ? '▾' : '▸';
+            };
 
             // ---- 消息渲染 ----
             function appendMsg(role, text, sources, isRestore) {

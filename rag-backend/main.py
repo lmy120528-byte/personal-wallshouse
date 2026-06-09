@@ -35,6 +35,7 @@ DEEPSEEK_API = "https://api.deepseek.com/v1/chat/completions"
 MAX_RETRIEVED = 5      # 每次最多检索几条知识
 MAX_HISTORY = 6         # 对话历史最多保留几轮（单数会取整）
 LOG_FILE = os.path.join(os.path.dirname(__file__), "chat_logs.jsonl")  # 对话日志
+DEEPSEEK_KEY = os.environ.get("DEEPSEEK_API_KEY", "")  # 从环境变量读取，不给前端暴露
 
 # ============================================================
 # System Prompt —— Agent 人格定义
@@ -118,7 +119,6 @@ chat_histories: dict[str, list] = {}
 class ChatRequest(BaseModel):
     message: str                     # 用户消息
     session_id: str = "default"      # 会话 ID（用于区分不同用户）
-    deepseek_key: str = ""           # DeepSeek API Key
 
 
 class ChatResponse(BaseModel):
@@ -183,10 +183,12 @@ def generate_answer(question: str, knowledge: list, history: list, api_key: str)
 
     # 调用 DeepSeek API
     req_body = {
-        "model": "deepseek-chat",
+        "model": "deepseek-v4-pro",
         "messages": messages,
         "temperature": 0.5,
         "max_tokens": 800,
+        "thinking": {"type": "enabled"},
+        "reasoning_effort": "high",
     }
 
     req = urllib.request.Request(
@@ -220,8 +222,8 @@ def root():
 def chat(req: ChatRequest, request: Request):
     """聊天接口：接收问题，返回回答"""
 
-    if not req.deepseek_key:
-        return ChatResponse(answer="请提供 DeepSeek API Key")
+    if not DEEPSEEK_KEY:
+        return ChatResponse(answer="服务未配置 API Key，请联系站长。")
 
     if collection is None:
         return ChatResponse(answer="知识库为空，请先运行 ingest.py 导入知识")
@@ -232,7 +234,7 @@ def chat(req: ChatRequest, request: Request):
         chat_histories[session] = []
     history = chat_histories[session]
 
-    answer = generate_answer(req.message, knowledge, history, req.deepseek_key)
+    answer = generate_answer(req.message, knowledge, history, DEEPSEEK_KEY)
 
     history.append({"user": req.message, "agent": answer})
     if len(history) > MAX_HISTORY:
@@ -263,11 +265,13 @@ def stream_deepseek(messages, api_key):
     )
 
     body = json.dumps({
-        "model": "deepseek-chat",
+        "model": "deepseek-v4-pro",
         "messages": messages,
         "temperature": 0.5,
         "max_tokens": 800,
-        "stream": True
+        "stream": True,
+        "thinking": {"type": "enabled"},
+        "reasoning_effort": "high",
     })
 
     try:
@@ -277,6 +281,11 @@ def stream_deepseek(messages, api_key):
         })
 
         resp = conn.getresponse()
+
+        # 检查 HTTP 状态码，非 200 时读取错误信息并抛出
+        if resp.status != 200:
+            err_body = resp.read().decode("utf-8", errors="replace")
+            raise Exception(f"DeepSeek API 返回 {resp.status}: {err_body[:300]}")
 
         # 逐行读取 SSE 流
         for line in resp:
@@ -289,11 +298,19 @@ def stream_deepseek(messages, api_key):
             try:
                 obj = json.loads(data)
                 delta = obj["choices"][0].get("delta", {})
+                # 推理过程（思考链）
+                reasoning = delta.get("reasoning_content", "")
+                if reasoning:
+                    yield ("reasoning", reasoning)
+                # 最终回答
                 content = delta.get("content", "")
                 if content:
-                    yield content
+                    yield ("content", content)
             except (json.JSONDecodeError, KeyError, IndexError):
                 pass
+    except Exception as e:
+        # 将异常作为错误事件 yield 出去，前端可以展示
+        yield ("error", str(e))
     finally:
         conn.close()
 
@@ -302,15 +319,15 @@ def stream_deepseek(messages, api_key):
 def chat_stream(req: ChatRequest, request: Request):
     """流式聊天接口：逐字返回回答"""
 
-    if not req.deepseek_key:
+    if not DEEPSEEK_KEY:
         return StreamingResponse(
-            iter([f"data: {json.dumps({'error': '请提供 DeepSeek API Key'})}\n\n"]),
+            iter([f"data: {json.dumps({'type': 'error', 'error': '服务未配置 API Key，请联系站长。'}, ensure_ascii=False)}\n\n"]),
             media_type="text/event-stream"
         )
 
     if collection is None:
         return StreamingResponse(
-            iter([f"data: {json.dumps({'error': '知识库为空'})}\n\n"]),
+            iter([f"data: {json.dumps({'type': 'error', 'error': '知识库为空，请先运行 ingest.py'}, ensure_ascii=False)}\n\n"]),
             media_type="text/event-stream"
         )
 
@@ -354,9 +371,15 @@ def chat_stream(req: ChatRequest, request: Request):
         yield f"data: {json.dumps({'type': 'sources', 'sources': sources}, ensure_ascii=False)}\n\n"
 
         try:
-            for chunk in stream_deepseek(messages, req.deepseek_key):
-                full_answer += chunk
-                yield f"data: {json.dumps({'type': 'content', 'content': chunk}, ensure_ascii=False)}\n\n"
+            for chunk_type, chunk_text in stream_deepseek(messages, DEEPSEEK_KEY):
+                if chunk_type == "error":
+                    # 流式调用出错，直接返回错误
+                    yield f"data: {json.dumps({'type': 'error', 'error': chunk_text}, ensure_ascii=False)}\n\n"
+                    yield "data: [DONE]\n\n"
+                    return
+                if chunk_type == "content":
+                    full_answer += chunk_text
+                yield f"data: {json.dumps({'type': chunk_type, 'content': chunk_text}, ensure_ascii=False)}\n\n"
         except Exception as e:
             yield f"data: {json.dumps({'type': 'error', 'error': str(e)}, ensure_ascii=False)}\n\n"
 
