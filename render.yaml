@@ -6,7 +6,7 @@ services:
     runtime: python
     rootDir: rag-backend
     buildCommand: pip install -r requirements.txt
-    startCommand: python3 start.py
+    startCommand: python3 main.py
     envVars:
       - key: DEEPSEEK_API_KEY
         sync: false  # 手动在 Render 后台设置，不提交到 git
