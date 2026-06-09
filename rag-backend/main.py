@@ -18,8 +18,7 @@ import urllib.request
 import urllib.error
 from datetime import datetime
 from urllib.parse import urlparse
-import chromadb
-from sentence_transformers import SentenceTransformer
+from retriever import Retriever
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse
@@ -28,9 +27,6 @@ from pydantic import BaseModel
 # ============================================================
 # 配置
 # ============================================================
-CHROMA_DIR = os.path.join(os.path.dirname(__file__), "chroma_data")
-COLLECTION_NAME = "zhangqiang"
-EMBEDDING_MODEL = "BAAI/bge-small-zh-v1.5"
 DEEPSEEK_API = "https://api.deepseek.com/v1/chat/completions"
 MAX_RETRIEVED = 5      # 每次最多检索几条知识
 MAX_HISTORY = 6         # 对话历史最多保留几轮（单数会取整）
@@ -83,31 +79,25 @@ def log_conversation(ip, session_id, question, answer, sources):
 
 
 # ============================================================
-# 初始化
+# 初始化：TF-IDF 轻量检索
 # ============================================================
-print("📦 加载嵌入模型...")
-embedding_model = SentenceTransformer(EMBEDDING_MODEL)
-print("   ✅ 嵌入模型就绪")
+from retriever import Retriever
 
-print("📦 连接向量数据库...")
-chroma_client = chromadb.PersistentClient(path=CHROMA_DIR)
+retriever = Retriever()
+print("📦 加载知识索引...")
 try:
-    collection = chroma_client.get_collection(name=COLLECTION_NAME)
-    print(f"   ✅ 知识库就绪（{collection.count()} 个切片）")
+    retriever.load()
 except Exception:
-    print("   ⚠️  知识库为空，自动构建中...")
-    # 部署环境首次启动：自动运行 ingest 构建知识库
+    print("   ⚠️  索引不存在，自动构建中...")
     import subprocess, sys
     result = subprocess.run(
         [sys.executable, os.path.join(os.path.dirname(__file__), "ingest.py")],
         capture_output=True, text=True, cwd=os.path.dirname(__file__)
     )
     if result.returncode == 0:
-        collection = chroma_client.get_collection(name=COLLECTION_NAME)
-        print(f"   ✅ 自动构建完成（{collection.count()} 个切片）")
+        retriever.load()
     else:
         print(f"   ❌ 自动构建失败: {result.stderr[:200]}")
-        collection = None
 
 # ============================================================
 # FastAPI 应用
@@ -139,27 +129,8 @@ class ChatResponse(BaseModel):
 
 # ---- 核心：检索知识 ----
 def search_knowledge(query: str, n: int = MAX_RETRIEVED):
-    """
-    把用户问题向量化 → 在知识库中找最相似的 n 个切片。
-    返回：[(文本, 来源), ...]
-    """
-    if collection is None:
-        return []
-
-    # 问题转向量
-    query_vec = embedding_model.encode(query, normalize_embeddings=True).tolist()
-
-    # 在 Chroma 中搜索
-    results = collection.query(query_embeddings=[query_vec], n_results=n)
-
-    # 整理结果
-    docs = []
-    for i in range(len(results["documents"][0])):
-        text = results["documents"][0][i]
-        source = results["metadatas"][0][i].get("source", "未知")
-        docs.append((text, source))
-
-    return docs
+    """TF-IDF 关键词检索，返回 [(文本, 来源), ...]"""
+    return retriever.search(query, n=n)
 
 
 # ---- 核心：生成回答 ----
@@ -226,7 +197,7 @@ def generate_answer(question: str, knowledge: list, history: list, api_key: str)
 # ---- API 端点 ----
 @app.get("/")
 def root():
-    return {"ok": True, "status": "张强数字分身运行中", "chunks": collection.count() if collection else 0}
+    return {"ok": True, "status": "张强数字分身运行中", "chunks": len(retriever.chunks) if retriever.chunks else 0}
 
 
 @app.post("/chat")
@@ -236,7 +207,7 @@ def chat(req: ChatRequest, request: Request):
     if not DEEPSEEK_KEY:
         return ChatResponse(answer="服务未配置 API Key，请联系站长。")
 
-    if collection is None:
+    if not retriever.chunks:
         return ChatResponse(answer="知识库为空，请先运行 ingest.py 导入知识")
 
     knowledge = search_knowledge(req.message)
@@ -336,7 +307,7 @@ def chat_stream(req: ChatRequest, request: Request):
             media_type="text/event-stream"
         )
 
-    if collection is None:
+    if not retriever.chunks:
         return StreamingResponse(
             iter([f"data: {json.dumps({'type': 'error', 'error': '知识库为空，请先运行 ingest.py'}, ensure_ascii=False)}\n\n"]),
             media_type="text/event-stream"
