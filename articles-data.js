@@ -76,6 +76,17 @@ var articles = [
     {
         series: 'ai',
         seriesName: '白话 AI',
+        title: 'AI 产品中的 Eval 评估体系是什么',
+        date: '2026-06-11',
+        summary: 'Evals评估体系是AI产品的质量保障基础设施，通过定义评分规则、设计评测集、设定合格阈值和分析Badcase，建立可量化、可重复、可迭代的效果验证与调优机制，解决AI产品“没有绝对正确答案”下的质量判断问题。',
+        wordCount: 3600,
+        readingTime: 14,
+        tags: ["Evals评估体系","AI产品质量保障"],
+        url: 'https://mp.weixin.qq.com/s/5xBLkA2dqWXtEHBhmbU_zw'
+    },
+    {
+        series: 'ai',
+        seriesName: '白话 AI',
         title: 'RAG是什么·有什么用途',
         date: '2026-06-05',
         summary: 'RAG（检索增强生成）通过检索外部文档辅助大模型回答，解决知识固化、幻觉和领域专业性问题，核心流程包括文档切片、向量化、存储和检索。',
