@@ -98,6 +98,17 @@ var articles = [
     {
         series: 'ai',
         seriesName: '白话 AI',
+        title: 'AI 产品中的 Eval 评估体系是什么',
+        date: '2026-06-06',
+        summary: '等待分析...',
+        wordCount: 0,
+        readingTime: 0,
+        tags: [],
+        url: 'https://mp.weixin.qq.com/s/5xBLkA2dqWXtEHBhmbU_zw'
+    },
+    {
+        series: 'ai',
+        seriesName: '白话 AI',
         title: 'RAG是什么·有什么用途',
         date: '2026-06-05',
         summary: 'RAG（检索增强生成）通过检索外部文档辅助大模型回答，解决知识固化、幻觉和领域专业性问题，核心流程包括文档切片、向量化、存储和检索。',
