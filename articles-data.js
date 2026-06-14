@@ -76,6 +76,17 @@ var articles = [
     {
         series: 'ai',
         seriesName: '白话 AI',
+        title: 'Eval 评估：如何定义问题集的评估维度',
+        date: '2026-06-14',
+        summary: 'Eval评估中，评分维度并非适用于所有问题，需基于Agent工作流定义问题与评分维度的映射，避免主观臆测。',
+        wordCount: 1900,
+        readingTime: 8,
+        tags: ["Eval评估","评分维度映射"],
+        url: 'https://mp.weixin.qq.com/s/T5ekoT6DUw5Qu_RD4tTqog'
+    },
+    {
+        series: 'ai',
+        seriesName: '白话 AI',
         title: 'AI 产品中的 Eval 评估体系是什么',
         date: '2026-06-11',
         summary: 'Evals评估体系是AI产品的质量保障基础设施，通过定义评分规则、设计评测集、设定合格阈值和分析Badcase，建立可量化、可重复、可迭代的效果验证与调优机制，解决AI产品“没有绝对正确答案”下的质量判断问题。',
