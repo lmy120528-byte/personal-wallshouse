@@ -24,7 +24,7 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_POST(self):
-        """路由：/analyze → DeepSeek，/deploy → 部署文章，/git-pull → 本地同步"""
+        """路由：/analyze → DeepSeek，/deploy → 部署文章，/update-knowledge → 知识库导出，/git-pull → 本地同步"""
         if self.path == '/git-pull':
             self._handle_git_pull()
             return
@@ -35,6 +35,10 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
 
         if self.path == '/read-articles':
             self._handle_read_articles()
+            return
+
+        if self.path == '/update-knowledge':
+            self._handle_update_knowledge()
             return
 
         if self.path != '/analyze':
@@ -151,17 +155,40 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
             with open(data_file, 'w', encoding='utf-8') as f:
                 f.write(content)
 
-            # git add
-            r1 = sp.run(['git', 'add', 'articles-data.js'],
+            # git add 所有变更（不漏任何文件）
+            r1 = sp.run(['git', 'add', '.'],
                        capture_output=True, text=True, timeout=10, cwd=project_dir)
             if r1.returncode != 0:
                 self._error(500, 'git add 失败: ' + (r1.stderr or r1.stdout))
                 return
 
+            # git status 检查是否有东西要提交
+            r_status = sp.run(['git', 'status', '--porcelain'],
+                            capture_output=True, text=True, timeout=10, cwd=project_dir)
+            if not r_status.stdout.strip():
+                # 没有变更，跳过 commit/push
+                print('   ⚠️ 没有新变更，跳过 push')
+                self.send_response(200)
+                self._cors_headers()
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({
+                    'ok': True,
+                    'output': '没有新变更，已跳过',
+                    'files': []
+                }).encode('utf-8'))
+                return
+
+            # 列出本次提交的文件
+            changed_files = [line[3:] for line in r_status.stdout.strip().split('\n') if line.strip()]
+            print(f'   📦 将提交 {len(changed_files)} 个文件: {changed_files}')
+
             # git commit
             r2 = sp.run(['git', 'commit', '-m', message],
                        capture_output=True, text=True, timeout=10, cwd=project_dir)
-            # commit 可能返回 "nothing to commit" 也算正常
+            if r2.returncode != 0 and 'nothing to commit' not in r2.stdout + r2.stderr:
+                self._error(500, 'git commit 失败: ' + (r2.stderr or r2.stdout))
+                return
 
             # git push
             r3 = sp.run(['git', 'push', 'origin', 'main'],
@@ -170,13 +197,109 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
                 self._error(500, 'git push 失败: ' + (r3.stderr or r3.stdout))
                 return
 
+            print(f'   ✅ 推送成功 → Vercel + Render 自动部署')
+
             self.send_response(200)
             self._cors_headers()
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
             self.wfile.write(json.dumps({
                 'ok': True,
-                'output': (r2.stdout + r3.stdout).strip()
+                'output': (r2.stdout + r3.stdout).strip(),
+                'files': changed_files
+            }).encode('utf-8'))
+
+        except Exception as e:
+            self._error(500, str(e))
+
+    def _handle_update_knowledge(self):
+        """接收文章全文（已含 Markdown 格式）→ 写入 knowledge/ → 重建 TF-IDF 索引"""
+        import subprocess as sp
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length)
+            req_data = json.loads(body)
+
+            articles = req_data.get('articles', [])
+            if not articles:
+                self._error(400, '缺少 articles 字段')
+                return
+
+            project_dir = os.path.dirname(os.path.abspath(__file__))
+            knowledge_dir = os.path.join(project_dir, 'rag-backend', 'knowledge')
+            os.makedirs(knowledge_dir, exist_ok=True)
+
+            written_files = []
+            for a in articles:
+                title = (a.get('title') or '无标题').strip()
+                content = (a.get('content') or '').strip()
+                if not content:
+                    continue
+
+                # 文件名：自动导入文章-{标题}.md（过滤非法字符）
+                safe_title = title.replace('/', '-').replace('\\', '-').replace(':', '：')
+                filename = f'自动导入文章-{safe_title}.md'
+                filepath = os.path.join(knowledge_dir, filename)
+
+                # 组装 Markdown（内容已由前端转为 Markdown 格式）
+                md_content = content
+                if a.get('url'):
+                    md_content += f'\n\n> 原文链接：{a["url"]}'
+                if a.get('tags') and len(a.get('tags', [])) > 0:
+                    md_content += f'\n> 标签：{"、".join(a["tags"])}'
+
+                with open(filepath, 'w', encoding='utf-8') as f:
+                    f.write(md_content)
+                written_files.append(filename)
+                print(f'   📄 知识库写入: {filename} ({len(content)} 字)')
+
+            if not written_files:
+                self._error(400, '没有有效文章内容可写入')
+                return
+
+            if not written_files:
+                self._error(400, '没有有效文章内容可写入')
+                return
+
+            # 重建 TF-IDF 索引
+            print(f'   🔄 重建索引中...')
+            ingest_py = os.path.join(project_dir, 'rag-backend', 'ingest.py')
+            result = sp.run(
+                ['python3', ingest_py],
+                capture_output=True, text=True, timeout=60,
+                cwd=os.path.join(project_dir, 'rag-backend')
+            )
+            if result.returncode != 0:
+                print(f'   ⚠️ 索引重建失败: {result.stderr[:300]}')
+                # 不阻断部署流程，文件已写入
+            else:
+                print(f'   ✅ 索引重建完成')
+
+            # 通知 RAG 后端热重载索引
+            reload_output = ''
+            try:
+                reload_req = urllib.request.Request(
+                    'http://localhost:8000/reload-index',
+                    data=b'{}',
+                    headers={'Content-Type': 'application/json'}
+                )
+                with urllib.request.urlopen(reload_req, timeout=10) as resp:
+                    reload_data = json.loads(resp.read())
+                    reload_output = f', 热重载: {reload_data.get("chunks_before", "?")} → {reload_data.get("chunks_after", "?")} 切片'
+                    print(f'   {reload_output}')
+            except Exception as reload_err:
+                reload_output = f', 热重载失败（后端可能未启动）: {reload_err}'
+                print(f'   ⚠️ {reload_output}')
+
+            self.send_response(200)
+            self._cors_headers()
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({
+                'ok': True,
+                'files': written_files,
+                'count': len(written_files),
+                'index_output': (result.stdout + result.stderr).strip()[-500:] + reload_output
             }).encode('utf-8'))
 
         except Exception as e:

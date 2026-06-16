@@ -4,5 +4,11 @@ rag-backend/chroma_data/
 rag-backend/chat_logs.jsonl
 rag-backend/__pycache__/
 rag-backend/*.pyc
+rag-backend/embeddings.pkl
+# 评测输出（不含题目和脚本）
+eval_results.json
+rag-backend/eval_results.json
+# 归档
+.Archive/
 # 本地配置
 .claude/settings.local.json

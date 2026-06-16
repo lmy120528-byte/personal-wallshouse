@@ -28,7 +28,7 @@ from pydantic import BaseModel
 # 配置
 # ============================================================
 DEEPSEEK_API = "https://api.deepseek.com/v1/chat/completions"
-MAX_RETRIEVED = 5      # 每次最多检索几条知识
+MAX_RETRIEVED = 8      # 每次最多检索几条知识
 MAX_HISTORY = 6         # 对话历史最多保留几轮（单数会取整）
 LOG_FILE = os.path.join(os.path.dirname(__file__), "chat_logs.jsonl")  # 对话日志
 DEEPSEEK_KEY = os.environ.get("DEEPSEEK_API_KEY", "")  # 从环境变量读取，不给前端暴露
@@ -128,9 +128,9 @@ class ChatResponse(BaseModel):
 
 
 # ---- 核心：检索知识 ----
-def search_knowledge(query: str, n: int = MAX_RETRIEVED):
-    """TF-IDF 关键词检索，返回 [(文本, 来源), ...]"""
-    return retriever.search(query, n=n)
+def search_knowledge(query: str, n: int = MAX_RETRIEVED, api_key: str = None):
+    """两阶段检索：TF-IDF 粗筛 + DeepSeek 精排，返回 [(文本, 来源, 元数据), ...]"""
+    return retriever.search(query, n=n, api_key=api_key)
 
 
 # ---- 核心：生成回答 ----
@@ -139,36 +139,45 @@ def generate_answer(question: str, knowledge: list, history: list, api_key: str)
     组装 Prompt → 调用 DeepSeek → 返回回答。
     """
 
-    # 组装知识上下文
+    # 组装知识上下文（简洁格式，避免模型复述标记）
     knowledge_text = ""
-    for i, (text, source) in enumerate(knowledge):
-        knowledge_text += f"\n--- 知识片段 {i+1}（来源：{source}）---\n{text}\n"
+    for i, item in enumerate(knowledge):
+        text, source = item[0], item[1]
+        knowledge_text += f"\n[参考{i+1} · {source}]\n{text}\n"
 
     # 组装对话历史
     history_text = ""
     for h in history:
         history_text += f"\n用户：{h['user']}\n张强：{h['agent']}\n"
 
-    # 构造发给 DeepSeek 的消息
-    messages = [
-        {"role": "system", "content": load_system_prompt()},
-        {"role": "system", "content": f"以下是张强的真实知识和经历，请基于这些内容回答：\n{knowledge_text}"},
-    ]
+    # ⚠️ 合并为一条 System 消息，避免多条 System 消息权重不确定
+    system_content = load_system_prompt()
+    system_content += "\n\n【知识库 — 严格基于以下内容回答。未提及的信息一律视为不存在。禁止编造。】"
+    system_content += "\n⚠️ 禁止在回答中输出\"[参考N]\"等标记、禁止逐字复述知识片段原文。这些内容仅供你理解背景。"
+    system_content += "\n\n【回答前自检】在回答工作经历类问题前，先在心里默念一遍你待过的所有公司：①北京瑞金麟 ②山东云医康 ③百度健康 ④GEO创业。然后在回答中逐一提到这四家公司，缺一不可。\n"
+    system_content += knowledge_text
 
     if history_text:
-        messages.append({
-            "role": "system",
-            "content": f"对话历史（用于理解上下文和追问）：\n{history_text}"
-        })
+        system_content += f"\n\n【对话历史 — 用于理解上下文和追问】\n{history_text}"
 
-    messages.append({"role": "user", "content": question})
+    # 构造消息 — 只有一条 System 消息
+    # 工作经历类问题：用户消息前置公司列表，强制逐家枚举
+    user_message = question
+    career_kw = ['经验', '经历', '工作', '职业', '公司', '简历', '履历', '项目经历']
+    if any(kw in question for kw in career_kw):
+        user_message = '回答要求：逐一列出你工作过的全部4家公司（①北京瑞金麟 ②山东云医康 ③百度健康 ④GEO创业），然后展开。不得跳过、合并或省略任何一家。\n\n用户问题：' + question
+
+    messages = [
+        {"role": "system", "content": system_content},
+        {"role": "user", "content": user_message},
+    ]
 
     # 调用 DeepSeek API
     req_body = {
         "model": "deepseek-v4-pro",
         "messages": messages,
         "temperature": 0.5,
-        "max_tokens": 800,
+        "max_tokens": 1200,
         "thinking": {"type": "enabled"},
         "reasoning_effort": "high",
     }
@@ -185,7 +194,9 @@ def generate_answer(question: str, knowledge: list, history: list, api_key: str)
     try:
         with urllib.request.urlopen(req) as resp:
             data = json.loads(resp.read())
-            answer = data["choices"][0]["message"]["content"]
+            message = data["choices"][0]["message"]
+            # 只取 content，reasoning_content（思考过程）不展示给用户
+            answer = message.get("content", "")
             return answer
     except urllib.error.HTTPError as e:
         err_body = e.read().decode("utf-8", errors="replace")
@@ -210,7 +221,7 @@ def chat(req: ChatRequest, request: Request):
     if not retriever.chunks:
         return ChatResponse(answer="知识库为空，请先运行 ingest.py 导入知识")
 
-    knowledge = search_knowledge(req.message)
+    knowledge = search_knowledge(req.message, api_key=DEEPSEEK_KEY)
     session = req.session_id
     if session not in chat_histories:
         chat_histories[session] = []
@@ -222,7 +233,7 @@ def chat(req: ChatRequest, request: Request):
     if len(history) > MAX_HISTORY:
         history.pop(0)
 
-    sources = [s for _, s in knowledge]
+    sources = [item[2].get("file", item[1]) for item in knowledge]
 
     # 记录日志
     client_ip = request.client.host if request.client else "unknown"
@@ -250,7 +261,7 @@ def stream_deepseek(messages, api_key):
         "model": "deepseek-v4-pro",
         "messages": messages,
         "temperature": 0.5,
-        "max_tokens": 800,
+        "max_tokens": 1200,
         "stream": True,
         "thinking": {"type": "enabled"},
         "reasoning_effort": "high",
@@ -313,13 +324,14 @@ def chat_stream(req: ChatRequest, request: Request):
             media_type="text/event-stream"
         )
 
-    knowledge = search_knowledge(req.message)
+    knowledge = search_knowledge(req.message, api_key=DEEPSEEK_KEY)
     client_ip = request.client.host if request.client else "unknown"
 
-    # 组装 Prompt
+    # 组装 Prompt（合并为一条 System 消息，避免多条 System 消息权重不确定）
     knowledge_text = ""
-    for i, (text, source) in enumerate(knowledge):
-        knowledge_text += f"\n--- 知识片段 {i+1}（来源：{source}）---\n{text}\n"
+    for i, item in enumerate(knowledge):
+        text, source = item[0], item[1]
+        knowledge_text += f"\n[参考{i+1} · {source}]\n{text}\n"
 
     # 对话历史
     session = req.session_id
@@ -331,19 +343,29 @@ def chat_stream(req: ChatRequest, request: Request):
     for h in history:
         history_text += f"\n用户：{h['user']}\n张强：{h['agent']}\n"
 
-    messages = [
-        {"role": "system", "content": load_system_prompt()},
-        {"role": "system", "content": f"以下是张强的真实知识和经历，请基于这些内容回答：\n{knowledge_text}"},
-    ]
+    # 合并为一条 System 消息
+    system_content = load_system_prompt()
+    system_content += "\n\n【知识库 — 严格基于以下内容回答。未提及的信息一律视为不存在。禁止编造。】"
+    system_content += "\n⚠️ 禁止在回答中输出\"[参考N]\"等标记、禁止逐字复述知识片段原文。这些内容仅供你理解背景。"
+    system_content += "\n\n【回答前自检】在回答工作经历类问题前，先在心里默念一遍你待过的所有公司：①北京瑞金麟 ②山东云医康 ③百度健康 ④GEO创业。然后在回答中逐一提到这四家公司，缺一不可。\n"
+    system_content += knowledge_text
+
     if history_text:
-        messages.append({
-            "role": "system",
-            "content": f"对话历史（用于理解上下文和追问）：\n{history_text}"
-        })
-    messages.append({"role": "user", "content": req.message})
+        system_content += f"\n\n【对话历史 — 用于理解上下文和追问】\n{history_text}"
+
+    # 工作经历类问题：用户消息前置公司列表，强制逐家枚举
+    user_message = req.message
+    career_kw = ['经验', '经历', '工作', '职业', '公司', '简历', '履历', '项目经历']
+    if any(kw in req.message for kw in career_kw):
+        user_message = '回答要求：逐一列出你工作过的全部4家公司（①北京瑞金麟 ②山东云医康 ③百度健康 ④GEO创业），然后展开。不得跳过、合并或省略任何一家。\n\n用户问题：' + req.message
+
+    messages = [
+        {"role": "system", "content": system_content},
+        {"role": "user", "content": user_message},
+    ]
 
     # 整理来源
-    sources = [s for _, s in knowledge]
+    sources = [item[2].get("file", item[1]) for item in knowledge]
 
     # 流式生成
     def generate():
@@ -392,6 +414,21 @@ def update_prompt(req: PromptUpdate):
     """更新 System Prompt（动态生效，无需重启）"""
     save_system_prompt(req.content)
     return {"ok": True, "length": len(req.content)}
+
+
+# ---- 索引热重载 ----
+@app.post("/reload-index")
+def reload_index():
+    """热重载 TF-IDF 索引（知识库更新后调用，无需重启服务）"""
+    try:
+        before = len(retriever.chunks) if retriever.chunks else 0
+        retriever.load()
+        after = len(retriever.chunks)
+        print(f"   🔄 索引热重载: {before} → {after} 个切片")
+        return {"ok": True, "chunks_before": before, "chunks_after": after}
+    except Exception as e:
+        print(f"   ❌ 索引重载失败: {e}")
+        return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
 
 
 # ---- 日志查看 ----

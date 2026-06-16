@@ -258,6 +258,7 @@
 
 <div class="toast" id="toast"></div>
 
+    <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
     <script>
         // ===== 全局状态 =====
         var articleCount = 0;
@@ -318,7 +319,7 @@
                 + '<div class="form-group"><label>公众号链接</label><input type="url" class="url-input" placeholder="https://mp.weixin.qq.com/s/..."></div>'
                 + '</div>'
                 + '<div class="form-row single"><div class="form-group"><label>文章标题</label><input type="text" class="title-input" placeholder="输入文章标题"></div></div>'
-                + '<div class="form-row single"><div class="form-group"><label>全文内容（从公众号复制粘贴）</label><textarea class="content-input collapsed" placeholder="粘贴文章全文内容..." onfocus="this.classList.remove(\'collapsed\')"></textarea></div></div>'
+                + '<div class="form-row single"><div class="form-group"><label>全文内容（从公众号复制粘贴）<span class="md-badge" style="display:none;font-size:10px;color:var(--success);margin-left:8px;">✅ Markdown 格式已识别</span></label><textarea class="content-input collapsed" placeholder="粘贴文章全文内容..." onfocus="this.classList.remove(\'collapsed\')"></textarea></div></div>'
                 + '<div class="analysis-result">'
                 + '<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;letter-spacing:0.5px;">分析结果</div>'
                 + '<div class="result-stats"><span class="stat-badge word-count">0 字</span><span class="stat-badge read-time">约 0 分钟</span></div>'
@@ -567,7 +568,8 @@
                     wordCount: wc,
                     readingTime: rt,
                     tags: tags,
-                    url: block.querySelector('.url-input').value.trim()
+                    url: block.querySelector('.url-input').value.trim(),
+                    content: block.querySelector('.content-input').value.trim()
                 });
             });
             return articles;
@@ -666,7 +668,29 @@
                 document.getElementById('previewContent').textContent = newContent;
                 document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
 
-                // 4. 部署：通过 proxy 写文件 + git push
+                // 4. 先导出知识库（在 git push 之前，确保 Render 同步）
+                var articlesWithContent = newArticles.filter(function(a) { return a.content && a.content.length > 0; });
+                if (articlesWithContent.length > 0) {
+                    document.getElementById('actionHint').textContent = '更新知识库...';
+                    try {
+                        var kbResp = await fetch('http://localhost:8081/update-knowledge', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ articles: articlesWithContent })
+                        });
+                        if (kbResp.ok) {
+                            var kbData = await kbResp.json();
+                            document.getElementById('actionHint').textContent = '知识库已更新 ' + kbData.count + ' 篇，正在推送...';
+                        } else {
+                            var kbErr = await kbResp.json();
+                            console.warn('知识库更新失败:', kbErr.error);
+                        }
+                    } catch (kbCatchErr) {
+                        console.warn('知识库更新异常:', kbCatchErr);
+                    }
+                }
+
+                // 5. 部署：通过 proxy 写文件 + git push（含知识库文件）
                 document.getElementById('actionHint').textContent = '推送到 GitHub...';
                 var deployResp = await fetch('http://localhost:8081/deploy', {
                     method: 'POST',
@@ -678,7 +702,8 @@
                 });
 
                 if (deployResp.ok) {
-                    showToast('推送成功！Vercel 自动部署中', 'success');
+                    var kbCount = articlesWithContent.length;
+                    showToast(kbCount > 0 ? '推送成功 + 知识库已同步（' + kbCount + ' 篇）' : '推送成功！Vercel 自动部署中', 'success');
                 } else {
                     var errData = await deployResp.json();
                     throw new Error(errData.error || '推送失败');
@@ -731,6 +756,70 @@
         });
 
         init();
+
+        // ===== Markdown 粘贴：拦截 content-input 的粘贴事件，HTML → Markdown =====
+        var turndownService = new TurndownService({
+            headingStyle: 'atx',
+            hr: '---',
+            bulletListMarker: '-',
+            codeBlockStyle: 'fenced'
+        });
+
+        // 公众号文章特性：去掉无意义的内联样式和 span
+        turndownService.addRule('stripWechatStyles', {
+            filter: function(node) {
+                return node.style && (node.style.cssText || node.getAttribute('style'));
+            },
+            replacement: function(content) { return content; }
+        });
+
+        document.addEventListener('paste', function(e) {
+            var textarea = e.target.closest('.content-input');
+            if (!textarea) return;
+
+            // 检查剪贴板是否有 HTML
+            var html = (e.clipboardData && e.clipboardData.getData('text/html'));
+            if (!html || !html.trim()) return;
+
+            // 用 Turndown 转换
+            var markdown;
+            try {
+                markdown = turndownService.turndown(html);
+            } catch (err) {
+                console.warn('Turndown 转换失败，使用纯文本:', err);
+                return; // 让浏览器走默认纯文本粘贴
+            }
+
+            if (!markdown || !markdown.trim()) return;
+
+            // 阻止默认粘贴行为
+            e.preventDefault();
+
+            // 插入 Markdown 到光标位置
+            var start = textarea.selectionStart;
+            var end = textarea.selectionEnd;
+            var before = textarea.value.substring(0, start);
+            var after = textarea.value.substring(end);
+            textarea.value = before + markdown + after;
+            textarea.selectionStart = textarea.selectionEnd = start + markdown.length;
+
+            // 展开文本框
+            textarea.classList.remove('collapsed');
+
+            // 触发 input 事件以更新部署按钮状态
+            textarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+            // 显示格式识别标记
+            var badge = textarea.closest('.form-row').querySelector('.md-badge');
+            if (badge) { badge.style.display = 'inline'; }
+
+            // 绿色闪动反馈
+            textarea.style.transition = 'border-color 0.3s ease';
+            textarea.style.borderColor = 'var(--success)';
+            setTimeout(function() { textarea.style.borderColor = ''; }, 1500);
+
+            console.log('✅ Markdown 粘贴成功: 已转换 ' + html.length + ' 字节 HTML → ' + markdown.length + ' 字 Markdown');
+        });
 
         // ===== Tab 切换 =====
         var currentTab = 'articles';
