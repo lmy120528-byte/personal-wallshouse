@@ -8,6 +8,17 @@ var articles = [
     {
         series: 'geo',
         seriesName: 'GEO 实战',
+        title: 'GEO 的三次跃迁：行业的边界，从来都是 AI 平台画的',
+        date: '2026-06-18',
+        summary: 'GEO的边界由AI平台进化阶段决定：从信息分发的品牌可见性，到服务触达的线索获客，再到交易闭环的转化成交，服务商需跟随平台生态升级能力。',
+        wordCount: 1400,
+        readingTime: 6,
+        tags: ["GEO进化","AI平台生态"],
+        url: 'https://mp.weixin.qq.com/s/Fi2-Rt8Z8IUFg22tHp3gMw'
+    },
+    {
+        series: 'geo',
+        seriesName: 'GEO 实战',
         title: 'GEO做法解析——两端一连接',
         date: '2026-05-17',
         summary: 'GEO优化需从传统SEO转向“两端一连接”框架：品牌端构建模型可理解的结构化内容资产，模型端理解AI认知逻辑，连接端布局多源可交叉验证的信息网络。',
