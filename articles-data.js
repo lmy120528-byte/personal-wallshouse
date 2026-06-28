@@ -98,6 +98,17 @@ var articles = [
     {
         series: 'ai',
         seriesName: '白话 AI',
+        title: '产品经理用 VibeCoding搭建个人网站 系列（1）',
+        date: '2026-06-28',
+        summary: '产品经理用VibeCoding搭建个人网站，通过Claude Code、GitHub、Vercel、Render四个工具实现零成本部署，并构建基于RAG的数字分身Agent，强调AI时代产品经理需理解技术边界并引导模型。',
+        wordCount: 3300,
+        readingTime: 13,
+        tags: ["VibeCoding","数字分身Agent"],
+        url: 'https://mp.weixin.qq.com/s/gIy72m_sUte1bE1n5KMS5A'
+    },
+    {
+        series: 'ai',
+        seriesName: '白话 AI',
         title: 'Eval 评估：如何定义问题集的评估维度',
         date: '2026-06-14',
         summary: 'Eval评估中，评分维度并非适用于所有问题，需基于Agent工作流定义问题与评分维度的映射，避免主观臆测。',
