@@ -24,6 +24,8 @@
         }
         .admin-title { font-size: 17px; font-weight: 700; letter-spacing: 0.5px; }
         .admin-title span { color: var(--accent); }
+        .env-banner { display: none; background: rgba(94,234,212,0.08); border-bottom: 1px solid rgba(94,234,212,0.25); padding: 10px 32px; font-size: 13px; color: #a7f3e0; text-align: center; letter-spacing: 0.3px; }
+        .env-banner a { color: var(--accent); text-decoration: underline; }
         .admin-tabs { display: flex; gap: 8px; margin-left: 32px; }
         .admin-tab {
             font-size: 13px; padding: 6px 16px; border-radius: 8px;
@@ -168,6 +170,11 @@
         </div>
     </header>
 
+    <!-- 线上版提示条：仅线上访问时显示 -->
+    <div class="env-banner" id="envBanner">
+        ⚠️ 当前是线上版管理后台：「分析文章」可用；「推送部署」请使用本地管理后台（<a href="http://localhost:8080/admin.html">http://localhost:8080/admin.html</a>）
+    </div>
+
     <div class="container">
 
         <!-- ====== 文章管理 ====== -->
@@ -184,7 +191,7 @@
 
             <div style="width:100%;border-top:1px solid var(--border);margin:4px 0;"></div>
             <span style="font-size:11px;color:var(--text-muted);">
-                DeepSeek Key 用于本地 AI 分析，部署 Vercel 后改用环境变量 DEEPSEEK_API_KEY
+                DeepSeek Key 用于 AI 分析（本地、线上通用，未填写时回退服务端环境变量）
                 &nbsp;·&nbsp;
                 GitHub Token 需要 repo 权限 <a href="https://github.com/settings/tokens" target="_blank" style="color:var(--accent);">创建 Token →</a>
             </span>
@@ -263,10 +270,19 @@
         // ===== 全局状态 =====
         var articleCount = 0;
 
+        // 是否为本地管理后台（localhost / 直接打开本地文件）
+        function isLocalAdmin() {
+            return location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:';
+        }
+
         // ===== 初始化 =====
         function init() {
             loadSettings();
             addArticle();
+            // 线上版显示提示条（发布功能需本地环境）
+            if (!isLocalAdmin()) {
+                document.getElementById('envBanner').style.display = 'block';
+            }
         }
 
         // ===== 设置管理 =====
@@ -452,8 +468,7 @@
             var userPrompt = '请分析以下' + toAnalyze.length + '篇文章：\n\n' + articlesText + '\n只返回JSON数组，不要其他文字：';
 
             // 环境自适应：本地走本地代理，线上走 Vercel Serverless（均绕过浏览器 CORS 限制）
-            var isLocalAdmin = location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:';
-            var analyzeUrl = isLocalAdmin ? 'http://localhost:8081/analyze' : '/api/analyze';
+            var analyzeUrl = isLocalAdmin() ? 'http://localhost:8081/analyze' : '/api/analyze';
             var resp = await fetch(analyzeUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
