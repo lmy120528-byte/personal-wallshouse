@@ -451,8 +451,10 @@
 
             var userPrompt = '请分析以下' + toAnalyze.length + '篇文章：\n\n' + articlesText + '\n只返回JSON数组，不要其他文字：';
 
-            // 通过本地代理发送（绕过浏览器 CORS 限制）
-            var resp = await fetch('http://localhost:8081/analyze', {
+            // 环境自适应：本地走本地代理，线上走 Vercel Serverless（均绕过浏览器 CORS 限制）
+            var isLocalAdmin = location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:';
+            var analyzeUrl = isLocalAdmin ? 'http://localhost:8081/analyze' : '/api/analyze';
+            var resp = await fetch(analyzeUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
