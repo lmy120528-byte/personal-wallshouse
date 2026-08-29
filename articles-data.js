@@ -98,6 +98,17 @@ var articles = [
     {
         series: 'ai',
         seriesName: '白话 AI',
+        title: 'AI 时代的产品设计-在不确定的基座上寻求秩序',
+        date: '2026-07-21',
+        summary: 'AI时代产品设计从画路径转向设护栏，核心是区分哪些不确定性必须压制、哪些可以释放，并建立自动化评估体系。',
+        wordCount: 1700,
+        readingTime: 7,
+        tags: ["AI产品设计","不确定性管理"],
+        url: 'https://mp.weixin.qq.com/s/KtBexYv-1Dcsc4Bz7-8uzQ'
+    },
+    {
+        series: 'ai',
+        seriesName: '白话 AI',
         title: '产品经理用 VibeCoding搭建个人网站 系列（1）',
         date: '2026-06-28',
         summary: '产品经理用VibeCoding搭建个人网站，通过Claude Code、GitHub、Vercel、Render四个工具实现零成本部署，并构建基于RAG的数字分身Agent，强调AI时代产品经理需理解技术边界并引导模型。',

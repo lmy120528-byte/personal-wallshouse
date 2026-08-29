@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/zhangqiang/personal-site log --oneline -5)",
+      "Bash(curl -s -o /tmp/analyze_test.json -w \"HTTP %{http_code}\\\\n\" -X POST https://personal-wallshouse.vercel.app/api/analyze -H \"Content-Type: application/json\" -d '{\"articles\":[{\"title\":\"测试文章\",\"content\":\"GEO 是生成式引擎优化的缩写，是一种让内容在 AI 搜索结果中获得更好展示的方法。\"}]}')",
+      "Bash(awk '/<script>/{flag=1;next}/<\\\\/script>/{flag=0}flag' admin.html)",
+      "Bash(node --check /tmp/admin_inline.js)",
+      "Bash(git commit -m '线上管理后台增加环境提示条：发布文章请用本地后台 *)",
+      "Bash(lsof -i :8080 -sTCP:LISTEN)",
+      "Bash(lsof -i :8081 -sTCP:LISTEN)",
+      "Bash(curl -s -o /dev/null -w \"本地后台页面: HTTP %{http_code}\\\\n\" http://localhost:8080/admin.html)",
+      "Bash(open http://localhost:8080/admin.html)"
+    ]
+  }
+}
