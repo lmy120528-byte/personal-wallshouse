@@ -9,7 +9,8 @@
       "Bash(lsof -i :8080 -sTCP:LISTEN)",
       "Bash(lsof -i :8081 -sTCP:LISTEN)",
       "Bash(curl -s -o /dev/null -w \"本地后台页面: HTTP %{http_code}\\\\n\" http://localhost:8080/admin.html)",
-      "Bash(open http://localhost:8080/admin.html)"
+      "Bash(open http://localhost:8080/admin.html)",
+      "Bash(lsof -i :8000 -sTCP:LISTEN)"
     ]
   }
 }

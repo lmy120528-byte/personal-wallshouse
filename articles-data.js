@@ -8,6 +8,17 @@ var articles = [
     {
         series: 'geo',
         seriesName: 'GEO 实战',
+        title: 'GEO 需要一场“信任革命”：如何为 AI 时代搭建品牌信息的“安全声明”',
+        date: '2026-08-11',
+        summary: 'GEO行业陷入内容投喂的负和博弈，作者提出从\'外部扰动\'转向\'成为基础事实层\'的范式转移，通过数据原子化、区块链存证、去中心化验证和链上声誉构建AI可信的品牌信息基础设施，实现从抢排名到建画像的升维。',
+        wordCount: 6600,
+        readingTime: 27,
+        tags: ["GEO优化","信任机制"],
+        url: 'https://mp.weixin.qq.com/s/zG6JkTmc4ZFQUVZjf3xq3A'
+    },
+    {
+        series: 'geo',
+        seriesName: 'GEO 实战',
         title: '别把 GEO 做成 AI 版 SEO：它的终局是共生，不是对抗',
         date: '2026-06-18',
         summary: 'GEO不是AI版的SEO，其核心是与AI平台共生，通过标准化品牌信息帮助平台完善供给，而非钻空子抢流量。',
