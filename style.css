@@ -123,10 +123,11 @@ nav {
     padding: 0 20px;
     position: relative;
     overflow: hidden;
+    background: #05050a;
 }
 
-/* Canvas 背景层 */
-#heroBg {
+/* WebGL 波纹环层（底层主视觉） */
+#hero-fluid {
     position: absolute;
     top: 0;
     left: 0;
@@ -135,18 +136,32 @@ nav {
     z-index: 0;
 }
 
+#hero-fluid canvas {
+    display: block;
+}
+
+/* Canvas 粒子点阵层 */
+#heroBg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
 /* 暗色遮罩 —— 径向渐变，中间亮四周暗（聚光灯效果） */
 .hero-overlay {
     position: absolute;
     inset: 0;
     background:
         radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.85) 100%);
-    z-index: 1;
+    z-index: 2;
 }
 
 .hero-content {
     position: relative;
-    z-index: 2;
+    z-index: 3;
 }
 
 .hero-title-wrap {
@@ -211,7 +226,7 @@ nav {
     bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 2;
+    z-index: 3;
 
     /* 标题动画完成后出现 */
     animation: fadeInUp 0.8s ease-out 2.0s both;

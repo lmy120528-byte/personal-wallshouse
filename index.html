@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>张强 - AI 时代的产品 Builder 与翻译官</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Hero 动效依赖：defer 不阻塞首屏文字渲染，按顺序执行 -->
+    <script defer src="js/three.min.js"></script>
+    <script defer src="js/gsap.min.js"></script>
+    <script defer src="hero-v2.js"></script>
 </head>
 <body>
     <!-- 导航栏 -->
@@ -27,6 +31,7 @@
 
     <!-- ① 首屏 Hero -->
     <section class="hero">
+        <div id="hero-fluid"></div>
         <canvas id="heroBg"></canvas>
         <div class="hero-overlay"></div>
         <div class="hero-content">
@@ -351,7 +356,6 @@
         // 标题第二行动画结束后开始打字（约 1.5s）
         setTimeout(typeWriter, 1600);
     </script>
-    <script src="hero-bg.js"></script>
     <script>
         // 时间轴圆点：检测当前滚动到哪家公司，高亮对应圆点
         (function () {

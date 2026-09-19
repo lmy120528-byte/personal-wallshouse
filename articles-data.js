@@ -109,6 +109,17 @@ var articles = [
     {
         series: 'ai',
         seriesName: '白话 AI',
+        title: 'DeepSeek Harness 机制初探：三个心智模型，搞懂 Agent 时代的「操作系统」',
+        date: '2026-08-10',
+        summary: 'DeepSeek Harness 是面向 AI Agent 的插件化运行时操作系统，用插件树、叠层配置、流水线三个心智模型讲清其底层机制。',
+        wordCount: 5500,
+        readingTime: 22,
+        tags: ["Agent操作系统","插件化架构"],
+        url: 'https://mp.weixin.qq.com/s/qOdSbTmyp3oJ2FQKq9ek0A'
+    },
+    {
+        series: 'ai',
+        seriesName: '白话 AI',
         title: 'AI 时代的产品设计-在不确定的基座上寻求秩序',
         date: '2026-07-21',
         summary: 'AI时代产品设计从画路径转向设护栏，核心是区分哪些不确定性必须压制、哪些可以释放，并建立自动化评估体系。',
