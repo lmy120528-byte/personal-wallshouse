@@ -183,6 +183,7 @@
         <div class="settings-bar" id="settingsPanel" style="">
             <label>DeepSeek Key</label>
             <input type="password" id="deepseekKey" placeholder="sk-xxxxxxxxxxxx" oninput="saveSettings()">
+            <button class="btn btn-sm" id="saveServerKeyBtn" onclick="saveServerKey()" style="display:none;">保存到服务器</button>
             <span class="settings-status" id="deepseekStatus">未设置</span>
 
             <label>GitHub Token</label>
@@ -191,7 +192,7 @@
 
             <div style="width:100%;border-top:1px solid var(--border);margin:4px 0;"></div>
             <span style="font-size:11px;color:var(--text-muted);">
-                DeepSeek Key 用于 AI 分析（本地、线上通用，未填写时回退服务端环境变量）
+                <span id="settingsHint">DeepSeek Key 用于 AI 分析（本地、线上通用，未填写时回退服务端环境变量）</span>
                 &nbsp;·&nbsp;
                 GitHub Token 需要 repo 权限 <a href="https://github.com/settings/tokens" target="_blank" style="color:var(--accent);">创建 Token →</a>
             </span>
@@ -288,6 +289,12 @@
             if (!isLocalAdmin()) {
                 document.getElementById('envBanner').style.display = 'block';
             }
+            // 服务器环境：显示「保存到服务器」按钮，并检查服务器 Key 配置状态
+            if (isServerAdmin()) {
+                document.getElementById('saveServerKeyBtn').style.display = '';
+                document.getElementById('settingsHint').textContent = '输入 Key 并点击「保存到服务器」后，数字分身聊天与分析共用此 Key';
+                checkServerKey();
+            }
         }
 
         // ===== 设置管理 =====
@@ -304,6 +311,53 @@
             showToast('设置已保存', 'success');
         }
 
+        // ===== 服务器 Key 配置（O 端 → 后端 .env，聊天与分析共用） =====
+        function checkServerKey() {
+            fetch('/personal/api/server-key')
+                .then(function(r) { return r.json(); })
+                .then(function(data) { setServerKeyStatus(!!data.configured); })
+                .catch(function() { setServerKeyStatus(false); });
+        }
+
+        function setServerKeyStatus(configured) {
+            var ds = document.getElementById('deepseekStatus');
+            if (configured) {
+                ds.textContent = '服务器已配置 ✓';
+                ds.className = 'settings-status ok';
+            } else {
+                ds.textContent = '服务器未配置';
+                ds.className = 'settings-status missing';
+            }
+        }
+
+        function saveServerKey() {
+            var key = document.getElementById('deepseekKey').value.trim();
+            if (!key) { showToast('请先输入 Key', 'error'); return; }
+            var btn = document.getElementById('saveServerKeyBtn');
+            btn.disabled = true;
+            btn.textContent = '保存中...';
+            fetch('/personal/api/server-key', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ api_key: key })
+            }).then(function(r) { return r.json(); }).then(function(data) {
+                if (data.ok) {
+                    setServerKeyStatus(true);
+                    showToast(data.message || 'Key 已保存并生效', 'success');
+                } else if (data.already_set) {
+                    setServerKeyStatus(true);  // 服务器已有 Key（可能是之前配置的），不影响使用
+                    showToast('服务器已有 Key，本次未改动', 'success');
+                } else {
+                    showToast(data.error || '保存失败', 'error');
+                }
+            }).catch(function(err) {
+                showToast('保存失败: ' + err, 'error');
+            }).then(function() {
+                btn.disabled = false;
+                btn.textContent = '保存到服务器';
+            });
+        }
+
         function toggleSettings() {
             var panel = document.getElementById('settingsPanel');
             panel.style.display = panel.style.display === 'none' ? '' : 'none';
@@ -317,8 +371,11 @@
             // GitHub Token 和 DeepSeek Key 均可由 proxy 服务端环境变量提供，前端不填也能用
             gs.textContent = hasGh ? '前端已设' : '走代理';
             gs.className = 'settings-status ' + (hasGh ? 'ok' : '');
-            ds.textContent = hasDs ? '前端已设' : '走代理';
-            ds.className = 'settings-status ' + (hasDs ? 'ok' : '');
+            // 服务器上 DeepSeek Key 状态由 checkServerKey/saveServerKey 维护（显示服务器配置状态）
+            if (!isServerAdmin()) {
+                ds.textContent = hasDs ? '前端已设' : '走代理';
+                ds.className = 'settings-status ' + (hasDs ? 'ok' : '');
+            }
         }
 
         function getGitHubToken() { return document.getElementById('githubToken').value.trim(); }
@@ -441,7 +498,9 @@
 
         // 调用 DeepSeek API（兼容 OpenAI 格式）
         async function callDeepSeekAPI(articles) {
-            var apiKey = getDeepSeekKey();  // 未设置时留空，proxy 会自动用环境变量
+            // 服务器环境：统一用服务器 Key（O 端「保存到服务器」配置），不传浏览器里的 Key；
+            // 本地环境：用 localStorage 的 Key，未设置时留空，proxy 会自动用环境变量
+            var apiKey = isServerAdmin() ? '' : getDeepSeekKey();
 
             // 只分析有内容的文章
             var toAnalyze = articles.filter(function(a) { return a.content.length > 0; });

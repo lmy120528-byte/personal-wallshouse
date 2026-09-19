@@ -491,6 +491,45 @@ def analyze(req: AnalyzeRequest):
         return JSONResponse({"error": f"分析失败: {str(e)}"}, status_code=500)
 
 
+# ---- 服务器 Key 配置（O 端远程配置，Key 不经对话） ----
+ENV_FILE = os.path.join(os.path.dirname(__file__), ".env")
+
+class ServerKeyRequest(BaseModel):
+    api_key: str = ""
+
+@app.get("/server-key")
+def get_server_key_status():
+    """只返回是否已配置，绝不返回 Key 本身。供管理后台显示状态。"""
+    return {"configured": bool(DEEPSEEK_KEY)}
+
+@app.post("/server-key")
+def set_server_key(req: ServerKeyRequest):
+    """O 端配置服务器 DeepSeek Key：
+    首次配置（当前无 Key）→ 写入 .env 并热更新内存，数字分身立即可用；
+    已有 Key → 拒绝覆盖，防止接口被他人滥用篡改（更换需 SSH 修改 .env）。"""
+    global DEEPSEEK_KEY
+
+    api_key = (req.api_key or "").strip()
+    if not api_key:
+        return JSONResponse({"error": "Key 不能为空"}, status_code=400)
+
+    if DEEPSEEK_KEY:
+        return JSONResponse(
+            {"error": "服务器 Key 已配置，本次未改动（如需更换请 SSH 修改 .env 后重启服务）", "already_set": True},
+            status_code=403,
+        )
+
+    try:
+        with open(ENV_FILE, "w", encoding="utf-8") as f:
+            f.write(f"DEEPSEEK_API_KEY={api_key}\n")
+        os.chmod(ENV_FILE, 0o600)  # 仅属主可读写
+        DEEPSEEK_KEY = api_key  # 热更新，无需重启
+        print("[server-key] Key 已通过管理后台写入 .env 并生效")
+        return {"ok": True, "message": "Key 已保存并生效，数字分身立即可用"}
+    except Exception as e:
+        return JSONResponse({"error": f"保存失败: {str(e)}"}, status_code=500)
+
+
 # ============================================================
 # 启动
 # ============================================================
