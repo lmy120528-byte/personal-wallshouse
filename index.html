@@ -496,10 +496,8 @@
         // ===== 数字分身聊天逻辑 =====
         (function() {
             var API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-                ? 'http://localhost:8000/chat'                                     // 本地开发：直连本地 RAG 后端
-                : (window.location.hostname.indexOf('vercel.app') !== -1)
-                    ? 'https://personal-wallshouse.onrender.com/chat'              // Vercel 线上：走 Render 后端
-                    : '/personal/api/chat';                                        // 服务器：同源，经 nginx 反代到 8001
+                ? 'http://localhost:8000/chat'      // 本地开发：直连本地 RAG 后端
+                : '/personal/api/chat';             // 线上（腾讯云服务器）：同源，经 nginx 反代到 8001
             var STORAGE_KEY = 'chat_sessions';
             var CURRENT_SESSION_KEY = 'chat_current_session';
             var sessionId = null;
