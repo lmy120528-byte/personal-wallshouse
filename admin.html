@@ -275,6 +275,11 @@
             return location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:';
         }
 
+        // 服务器环境：通过 IP 访问（如 124.223.77.181），非本地也非 Vercel 域名
+        function isServerAdmin() {
+            return !isLocalAdmin() && /^\d+\.\d+\.\d+\.\d+$/.test(location.hostname);
+        }
+
         // ===== 初始化 =====
         function init() {
             loadSettings();
@@ -468,7 +473,8 @@
             var userPrompt = '请分析以下' + toAnalyze.length + '篇文章：\n\n' + articlesText + '\n只返回JSON数组，不要其他文字：';
 
             // 环境自适应：本地走本地代理，线上走 Vercel Serverless（均绕过浏览器 CORS 限制）
-            var analyzeUrl = isLocalAdmin() ? 'http://localhost:8081/analyze' : '/api/analyze';
+            var analyzeUrl = isLocalAdmin() ? 'http://localhost:8081/analyze'
+                : (isServerAdmin() ? '/personal/api/analyze' : '/api/analyze');
             var resp = await fetch(analyzeUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -858,7 +864,7 @@
             var status = document.getElementById('promptStatus');
             editor.value = '加载中...';
             status.textContent = '';
-            fetch('http://localhost:8000/system-prompt')
+            fetch(isLocalAdmin() ? 'http://localhost:8000/system-prompt' : '/personal/api/system-prompt')
                 .then(function(r) { return r.json(); })
                 .then(function(data) {
                     editor.value = data.content;
@@ -878,7 +884,7 @@
             if (!content) { showToast('内容不能为空', 'error'); return; }
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span> 保存中...';
-            fetch('http://localhost:8000/system-prompt', {
+            fetch(isLocalAdmin() ? 'http://localhost:8000/system-prompt' : '/personal/api/system-prompt', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: content })
@@ -902,7 +908,7 @@
             var container = document.getElementById('logsContainer');
             container.innerHTML = '<div class="log-empty"><span class="spinner"></span> 加载中...</div>';
 
-            fetch('http://localhost:8000/chat/logs?limit=200')
+            fetch(isLocalAdmin() ? 'http://localhost:8000/chat/logs?limit=200' : '/personal/api/chat/logs?limit=200')
                 .then(function(r) { return r.json(); })
                 .then(function(data) {
                     if (!data.logs || data.logs.length === 0) {

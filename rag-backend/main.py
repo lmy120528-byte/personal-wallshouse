@@ -452,6 +452,45 @@ def view_logs(limit: int = 50):
         return JSONResponse({"error": str(e)}, status_code=500)
 
 
+# ---- 文章分析（服务器版管理后台用） ----
+# 与本地 proxy.py /analyze、Vercel api/analyze.js 行为一致：
+# 接收 OpenAI 格式（api_key + model + messages），转发 DeepSeek，原样返回
+class AnalyzeRequest(BaseModel):
+    api_key: str = ""
+    model: str = "deepseek-chat"
+    messages: list = []
+
+@app.post("/analyze")
+def analyze(req: AnalyzeRequest):
+    """转发文章分析请求到 DeepSeek。api_key 优先取请求体，回退服务器环境变量。"""
+    api_key = (req.api_key or "").strip() or DEEPSEEK_KEY
+    if not api_key:
+        return JSONResponse(
+            {"error": "缺少 api_key（请在管理后台设置或配置环境变量 DEEPSEEK_API_KEY）"},
+            status_code=400,
+        )
+
+    payload = {"model": req.model, "messages": req.messages}
+
+    try:
+        http_req = urllib.request.Request(
+            DEEPSEEK_API,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}",
+            },
+        )
+        with urllib.request.urlopen(http_req) as resp:
+            resp_body = resp.read()
+            return JSONResponse(json.loads(resp_body), status_code=resp.status)
+    except urllib.error.HTTPError as e:
+        err_body = e.read().decode("utf-8", errors="replace")
+        return JSONResponse({"error": err_body[:500]}, status_code=e.code)
+    except Exception as e:
+        return JSONResponse({"error": f"分析失败: {str(e)}"}, status_code=500)
+
+
 # ============================================================
 # 启动
 # ============================================================
