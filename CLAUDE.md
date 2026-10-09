@@ -7,7 +7,7 @@
 ## 技术信息
 - 部署平台：腾讯云服务器（nginx 静态服务 + systemd 后端，与奶粉 Agent 同机）
 - GitHub 仓库：https://github.com/lmy120528-byte/personal-wallshouse
-- 线上地址：https://personal.sevenpick.com.cn/personal/（管理后台 /personal/admin）
+- 线上地址：https://personal.sevenpick.com.cn/（管理后台 /admin）
 - IP 直连（备）：http://124.223.77.181/personal/
 - 备案号：京ICP备2026063162号-2（页脚展示）
 - 本地开发：`python3 -m http.server 8080`，然后访问 http://localhost:8080
