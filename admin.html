@@ -276,9 +276,14 @@
             return location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:';
         }
 
-        // 服务器环境：非本地访问即视为服务器（IP 或域名 personal.sevenpick.com.cn 均走 /personal/api/）
+        // 服务器环境：非本地访问即视为服务器
         function isServerAdmin() {
             return !isLocalAdmin();
+        }
+
+        // API 前缀：域名直访（personal.sevenpick.com.cn）用 /api/，IP 访问用 /personal/api/
+        function getApiPrefix() {
+            return window.location.hostname === 'personal.sevenpick.com.cn' ? '/api' : '/personal/api';
         }
 
         // ===== 初始化 =====
@@ -313,7 +318,7 @@
 
         // ===== 服务器 Key 配置（O 端 → 后端 .env，聊天与分析共用） =====
         function checkServerKey() {
-            fetch('/personal/api/server-key')
+            fetch(getApiPrefix() + '/server-key')
                 .then(function(r) { return r.json(); })
                 .then(function(data) { setServerKeyStatus(!!data.configured); })
                 .catch(function() { setServerKeyStatus(false); });
@@ -336,7 +341,7 @@
             var btn = document.getElementById('saveServerKeyBtn');
             btn.disabled = true;
             btn.textContent = '保存中...';
-            fetch('/personal/api/server-key', {
+            fetch(getApiPrefix() + '/server-key', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ api_key: key })
@@ -533,7 +538,7 @@
 
             // 环境自适应：本地走本地代理，线上走 Vercel Serverless（均绕过浏览器 CORS 限制）
             var analyzeUrl = isLocalAdmin() ? 'http://localhost:8081/analyze'
-                : (isServerAdmin() ? '/personal/api/analyze' : '/api/analyze');
+                : (isServerAdmin() ? getApiPrefix() + '/analyze' : '/api/analyze');
             var resp = await fetch(analyzeUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -923,7 +928,7 @@
             var status = document.getElementById('promptStatus');
             editor.value = '加载中...';
             status.textContent = '';
-            fetch(isLocalAdmin() ? 'http://localhost:8000/system-prompt' : '/personal/api/system-prompt')
+            fetch(isLocalAdmin() ? 'http://localhost:8000/system-prompt' : getApiPrefix() + '/system-prompt')
                 .then(function(r) { return r.json(); })
                 .then(function(data) {
                     editor.value = data.content;
@@ -943,7 +948,7 @@
             if (!content) { showToast('内容不能为空', 'error'); return; }
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span> 保存中...';
-            fetch(isLocalAdmin() ? 'http://localhost:8000/system-prompt' : '/personal/api/system-prompt', {
+            fetch(isLocalAdmin() ? 'http://localhost:8000/system-prompt' : getApiPrefix() + '/system-prompt', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: content })
@@ -967,7 +972,7 @@
             var container = document.getElementById('logsContainer');
             container.innerHTML = '<div class="log-empty"><span class="spinner"></span> 加载中...</div>';
 
-            fetch(isLocalAdmin() ? 'http://localhost:8000/chat/logs?limit=200' : '/personal/api/chat/logs?limit=200')
+            fetch(isLocalAdmin() ? 'http://localhost:8000/chat/logs?limit=200' : getApiPrefix() + '/chat/logs?limit=200')
                 .then(function(r) { return r.json(); })
                 .then(function(data) {
                     if (!data.logs || data.logs.length === 0) {
