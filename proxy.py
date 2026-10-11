@@ -197,7 +197,10 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
                 self._error(500, 'git push 失败: ' + (r3.stderr or r3.stdout))
                 return
 
-            print(f'   ✅ 推送成功 → Vercel + Render 自动部署')
+            print(f'   ✅ 推送成功 → GitHub（腾讯云服务器手动同步，已改为自动）')
+
+            # 自动同步腾讯云服务器：文章数据 + 知识库 + 索引 + 热加载
+            sync_result = self._sync_to_server(project_dir)
 
             self.send_response(200)
             self._cors_headers()
@@ -206,11 +209,65 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({
                 'ok': True,
                 'output': (r2.stdout + r3.stdout).strip(),
+                'server_sync': sync_result,
                 'files': changed_files
             }).encode('utf-8'))
 
         except Exception as e:
             self._error(500, str(e))
+
+    def _sync_to_server(self, project_dir):
+        """推送后自动同步腾讯云服务器：articles-data.js + 知识库 + 索引 + 热加载。
+
+        返回 {"ok": bool, "detail": str}；失败不阻断部署（页面提示，可手动喊 Claude 补同步）。
+        """
+        import subprocess as sp
+        SERVER = 'agentuser@124.223.77.181'
+        SITE_DIR = '/home/agentuser/personal-site'
+        RAG_DIR = '/home/agentuser/personal-rag'
+        # 防 macOS tar/scp 产生 ._ AppleDouble 垃圾文件
+        env = dict(os.environ, COPYFILE_DISABLE='1')
+        detail_parts = []
+
+        def run_step(cmd, label, timeout=90):
+            r = sp.run(cmd, capture_output=True, text=True, timeout=timeout, env=env)
+            ok = r.returncode == 0
+            err = (r.stderr or '').strip()
+            detail_parts.append(f"{'✅' if ok else '❌'} {label}" + (f"（{err[:120]}）" if err else ""))
+            return ok
+
+        # ① 文章数据（线上文章列表）
+        run_step(['scp', '-q', os.path.join(project_dir, 'articles-data.js'),
+                  f'{SERVER}:{SITE_DIR}/'], '文章列表 articles-data.js')
+
+        # ② 知识库文件（只传 .txt/.md，绝不整包传目录，防 ._ 垃圾文件）
+        knowledge_dir = os.path.join(project_dir, 'rag-backend', 'knowledge')
+        kb_files = [f for f in os.listdir(knowledge_dir)
+                    if (f.endswith('.txt') or f.endswith('.md'))
+                    and not f.startswith('.')]
+        if kb_files:
+            kb_paths = [os.path.join(knowledge_dir, f) for f in kb_files]
+            run_step(['scp', '-q'] + kb_paths + [f'{SERVER}:{RAG_DIR}/knowledge/'],
+                     f'知识库文件 {len(kb_files)} 个')
+        else:
+            detail_parts.append('⚠️ 知识库目录为空，跳过')
+
+        # ③ 检索索引（embeddings.pkl）
+        run_step(['scp', '-q', os.path.join(project_dir, 'rag-backend', 'embeddings.pkl'),
+                  f'{SERVER}:{RAG_DIR}/'], '检索索引 embeddings.pkl')
+
+        # ④ 服务器热加载索引（无需重启 systemd 服务）
+        run_step(['ssh', '-o', 'ConnectTimeout=10', SERVER,
+                  'curl -s -X POST http://127.0.0.1:8001/reload-index'],
+                 '服务器索引热加载')
+
+        detail = ' | '.join(detail_parts)
+        ok = all('❌' not in p for p in detail_parts)
+        if ok:
+            print(f'   🚀 腾讯云服务器同步完成')
+        else:
+            print(f'   ⚠️ 服务器同步部分失败: {detail}')
+        return {'ok': ok, 'detail': detail}
 
     def _handle_update_knowledge(self):
         """接收文章全文（已含 Markdown 格式）→ 写入 knowledge/ → 重建 TF-IDF 索引"""
