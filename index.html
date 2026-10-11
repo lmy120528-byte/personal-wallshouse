@@ -493,12 +493,6 @@
         </div>
     </div>
 
-    <!-- 右下角悬浮入口（数字分身） -->
-    <button class="chat-fab" id="btnOpenChatFab" aria-label="打开数字分身对话">
-        <span class="chat-fab-avatar">强</span>
-        <span class="chat-fab-dot"></span>
-    </button>
-
     <script>
         // ===== 数字分身聊天逻辑 =====
         (function() {
@@ -625,7 +619,6 @@
             }
 
             document.getElementById('btnOpenChat').addEventListener('click', openChat);
-            document.getElementById('btnOpenChatFab').addEventListener('click', openChat);
             document.getElementById('btnCloseChat').addEventListener('click', closeChat);
             overlay.addEventListener('click', closeChat);
 
