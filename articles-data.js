@@ -71,39 +71,6 @@ var articles = [
         tags: ["GEO认知体","品牌Agent"],
         url: 'https://mp.weixin.qq.com/s/sUgA3lK6pUNyOQGY4J_PhA'
     },
-    {
-        series: 'geo',
-        seriesName: 'GEO 实战',
-        title: '如何让你的内容被 AI 搜索引用：三条核心原则',
-        date: '2025-01-15',
-        summary: '基于一线实操经验，总结出让 AI 搜索引擎更愿意引用你内容的三条关键原则和实操技巧。',
-        wordCount: 2800,
-        readingTime: 11,
-        tags: ["GEO","AI搜索","内容优化"],
-        url: 'https://mp.weixin.qq.com/s/sUgA3lK6pUNyOQGY4J_PhA'
-    },
-    {
-        series: 'geo',
-        seriesName: 'GEO 实战',
-        title: 'GEO 与传统 SEO 的本质区别：思维模式的转变',
-        date: '2025-01-10',
-        summary: '为什么用传统 SEO 的思维做 GEO 行不通？深入分析两种范式的底层逻辑差异与应对策略。',
-        wordCount: 3500,
-        readingTime: 14,
-        tags: ["GEO","SEO","思维模式"],
-        url: 'https://mp.weixin.qq.com/s/sUgA3lK6pUNyOQGY4J_PhA'
-    },
-    {
-        series: 'geo',
-        seriesName: 'GEO 实战',
-        title: '实战复盘：一次 GEO 策略调整带来的 3 倍流量增长',
-        date: '2025-01-05',
-        summary: '记录一次完整的 GEO 策略调整过程，从问题诊断、方案设计到效果验证的全链路实操复盘。',
-        wordCount: 4100,
-        readingTime: 16,
-        tags: ["GEO","复盘","增长"],
-        url: 'https://mp.weixin.qq.com/s/sUgA3lK6pUNyOQGY4J_PhA'
-    },
 
     // ===== 白话 AI =====
     {
@@ -193,50 +160,5 @@ var articles = [
         readingTime: 6,
         tags: ["用户研究方法","定性与定量"],
         url: 'https://mp.weixin.qq.com/s/o4dX0aSN_35NeI6ozcV_Gw'
-    },
-    {
-        series: 'ai',
-        seriesName: '白话 AI',
-        title: '什么是大语言模型？用做菜来理解 LLM 的原理',
-        date: '2025-01-20',
-        summary: '不用任何术语，用"做菜"这个生活场景帮你理解大语言模型到底是怎么工作的。',
-        wordCount: 2200,
-        readingTime: 9,
-        tags: ["LLM","科普","AI基础"],
-        url: 'https://mp.weixin.qq.com/s/sUgA3lK6pUNyOQGY4J_PhA'
-    },
-    {
-        series: 'ai',
-        seriesName: '白话 AI',
-        title: 'Prompt 不是咒语：三分钟搞懂提示词的本质',
-        date: '2025-01-18',
-        summary: '为什么有些人的 Prompt 效果好、有些不行？揭开提示词的神秘面纱，用大白话讲清楚原理。',
-        wordCount: 1800,
-        readingTime: 7,
-        tags: ["Prompt","提示词","科普"],
-        url: 'https://mp.weixin.qq.com/s/sUgA3lK6pUNyOQGY4J_PhA'
-    },
-    {
-        series: 'ai',
-        seriesName: '白话 AI',
-        title: 'Agent 到底是什么？不是魔法，是"会动手的 AI"',
-        date: '2025-01-12',
-        summary: 'Agent 是当下 AI 圈最热的概念之一，但它不是魔法。用通俗的方式解释 Agent 的核心原理与应用场景。',
-        wordCount: 2600,
-        readingTime: 10,
-        tags: ["Agent","AI应用","科普"],
-        url: 'https://mp.weixin.qq.com/s/sUgA3lK6pUNyOQGY4J_PhA'
-    },
-    {
-        series: 'ai',
-        seriesName: '白话 AI',
-        title: 'Embedding 嵌入：让机器"理解"词语之间的关系',
-        date: '2025-01-08',
-        summary: '"词语变成数字就能让机器理解含义？"用最简单的例子讲清楚 Embedding 这个 AI 领域的基础概念。',
-        wordCount: 2000,
-        readingTime: 8,
-        tags: ["Embedding","NLP","科普"],
-        url: 'https://mp.weixin.qq.com/s/sUgA3lK6pUNyOQGY4J_PhA'
     }
-
 ];
