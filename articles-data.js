@@ -76,6 +76,17 @@ var articles = [
     {
         series: 'ai',
         seriesName: '白话 AI',
+        title: 'Agent 比我做得好，我为什么不敢放手？',
+        date: '2026-10-11',
+        summary: '传统产品经理面对Agent时产生失控感，源于思考维度从执行细节位移到意图架构与边界设定，人应守住方向判断与最终裁决权。',
+        wordCount: 2200,
+        readingTime: 9,
+        tags: ["Agent协作","产品经理转型"],
+        url: 'https://mp.weixin.qq.com/s/wIqoxG50vXb4VwvibC62Rw'
+    },
+    {
+        series: 'ai',
+        seriesName: '白话 AI',
         title: 'DeepSeek Harness 机制初探：三个心智模型，搞懂 Agent 时代的「操作系统」',
         date: '2026-08-10',
         summary: 'DeepSeek Harness 是面向 AI Agent 的插件化运行时操作系统，用插件树、叠层配置、流水线三个心智模型讲清其底层机制。',
@@ -161,4 +172,5 @@ var articles = [
         tags: ["用户研究方法","定性与定量"],
         url: 'https://mp.weixin.qq.com/s/o4dX0aSN_35NeI6ozcV_Gw'
     }
+
 ];
