@@ -507,9 +507,9 @@
 
         // 调用 DeepSeek API（兼容 OpenAI 格式）
         async function callDeepSeekAPI(articles) {
-            // 服务器环境：统一用服务器 Key（O 端「保存到服务器」配置），不传浏览器里的 Key；
-            // 本地环境：用 localStorage 的 Key，未设置时留空，proxy 会自动用环境变量
-            var apiKey = isServerAdmin() ? '' : getDeepSeekKey();
+            // 统一用服务器 Key：本地和服务器环境都留空，由后端 /analyze 回退到服务器配置的 Key
+            // （避免本地 localStorage / 环境变量里的过期 Key 导致鉴权失败）
+            var apiKey = (isLocalAdmin() || isServerAdmin()) ? '' : getDeepSeekKey();
 
             // 只分析有内容的文章
             var toAnalyze = articles.filter(function(a) { return a.content.length > 0; });
@@ -540,8 +540,8 @@
 
             var userPrompt = '请分析以下' + toAnalyze.length + '篇文章：\n\n' + articlesText + '\n只返回JSON数组，不要其他文字：';
 
-            // 环境自适应：本地走本地代理，线上走 Vercel Serverless（均绕过浏览器 CORS 限制）
-            var analyzeUrl = isLocalAdmin() ? 'http://localhost:8081/analyze'
+            // 环境自适应：本地和线上都调同一个后端（域名 /api/analyze），后端 CORS 已放开
+            var analyzeUrl = isLocalAdmin() ? 'https://personal.sevenpick.com.cn/api/analyze'
                 : (isServerAdmin() ? getApiPrefix() + '/analyze' : '/api/analyze');
             var resp = await fetch(analyzeUrl, {
                 method: 'POST',
