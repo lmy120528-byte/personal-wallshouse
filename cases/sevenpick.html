@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case 01 · 七选宝宝养育助手 Agent 的 0→1 历程 - 张强作品集</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body id="top">
+    <!-- 导航栏 -->
+    <nav>
+        <div class="nav-left">
+            <a href="../index.html" class="nav-home-link">
+                <img src="../images/avatar.jpg" alt="张强" class="nav-icon">
+                <span class="nav-brand">Product Builder</span>
+            </a>
+        </div>
+        <div class="nav-right">
+            <a href="../index.html">首页</a>
+            <a href="../index.html#work">项目作品</a>
+            <a href="../index.html#about">关于</a>
+            <a href="../articles.html">思考输出</a>
+            <a href="../index.html#contact">联系</a>
+        </div>
+    </nav>
+
+    <div class="case-page">
+        <a class="case-back" href="../index.html#work">← 返回项目作品</a>
+
+        <p class="case-kicker">CASE 01 · 独立 PRODUCT BUILDER</p>
+        <h1>七选 · 宝宝养育助手 Agent</h1>
+        <p class="case-lead">
+            一个人，8 周，从 0 到 1 独立跑通「需求 → 设计 → 开发 → 评测 → 上线」完整闭环。<br>
+            微信小程序「七选」已上线（微信搜索即可体验）。
+        </p>
+
+        <!-- 01 问题 -->
+        <div class="case-block">
+            <h2><span class="cb-num">01</span>问题：一个宝爸的真实痛点</h2>
+            <p>
+                选奶粉，货架上有几百种「好」——小红书测评、群里妈妈、电商评价，信息碎片化且互相矛盾，却没有一个答案回答真正的问题：<strong>我的宝宝适合什么</strong>。
+            </p>
+            <p>
+                市面上的答案都在说「我这个产品好」，没有人为「你的宝宝」回答。新手父母面对的是信息过载、广告轰炸、决策焦虑三重困境。
+            </p>
+            <p>
+                做这件事有三个动机叠加：<strong>一个宝爸的真实痛点</strong>（需求真实）＋ <strong>一次 GEO 创业的模式验证</strong>（把 869 个 SKU 变成结构化、可信的「品牌认知体」，让 AI 看见、评估、链接）＋ <strong>一场 AI Product Builder 的自我证明</strong>（独立跑完产品全流程）。
+            </p>
+            <p>需求收敛为一句话：<strong>「几轮对话，给我家宝宝一个答案」</strong>。</p>
+        </div>
+
+        <!-- 02 方案 -->
+        <div class="case-block">
+            <h2><span class="cb-num">02</span>方案：三层产品结构，每层独立可迭代、可评测</h2>
+            <p><strong>用户层 · 画像提取：</strong>用户不是来「提供数据」的，是来「求助」的。设计原则是「先接情绪，再问信息」——先给确定性（"绿便不一定是奶粉问题"），再补一个轻追问，一次只问一件事。LLM 在对话中并行抽取 7 个关键字段（月龄/体质/预算/喂养方式/转奶原因/价值观），只记录用户说过的、不推测，画像分 L1/L2/L3 三层驱动后续策略。</p>
+            <p><strong>匹配层 · 匹配与链接：</strong>中间层只做一件事——让合适的产品连接上合适的人。两轮匹配：硬规则过滤保底线（月龄→段位映射、过敏体质不推商品转就医建议、预算过滤，绝不翻车），LLM 打分做理解（Top 8 候选综合体质匹配度/配方/口碑/价格排序 → Top 3 + 可解释理由）。每一条推荐都能追溯到「画像的哪个字段 × 图谱的哪个属性」。</p>
+            <p><strong>供给层 · 知识图谱：</strong>淘宝开放平台采集 869 个 SKU，品牌归一化（48 个原始品牌 → 14 标准品牌 / 45 核心系列），收敛为 323 个可推荐 SKU；产品维度 + 成分维度双层图谱，Graph RAG 检索；字段标注来源与可信度，低可信度数据不参与决策排序。</p>
+            <p><strong>工作原则 · 60 分原则：</strong>每一层做到能跑就往下走，不恋战——数据不够全没关系，10 个 SKU 够跑通；评测不够严谨没关系，有评测环节就证明有质量意识。核心目标始终是：全流程跑通。</p>
+        </div>
+
+        <!-- 03 评测与迭代 -->
+        <div class="case-block">
+            <h2><span class="cb-num">03</span>评测与迭代：在「没有标准答案」的世界里建坐标系</h2>
+            <p>AI 产品的推荐没有绝对正确，如何判断「好不好、有没有变好」？自建了一套自动化 Eval 体系：</p>
+            <ul>
+                <li><strong>六维评分卡</strong>（0-5 六档加权）：安全合规 25%（过敏红线一票否决）、推荐理由因果链 22%、排名合理性 18%、JSON 格式 15%、体验流畅性 10%、诚实度 10%；</li>
+                <li><strong>30 道真实场景评测题</strong>，覆盖 5 条链路，模拟用户对话端到端评测，LLM-as-Judge 判分，约 16 分钟自动跑完一轮；</li>
+                <li><strong>评测闭环</strong>：标准 → 问题集 → 自动评测 → badcase 定位 → 修复 → 同尺复测，一周一循环。</li>
+            </ul>
+            <p>最有价值的一次定位：早产儿场景得分低，现象是「推荐全是普通配方」——根因不在 LLM，而在候选层：Top 8 按数据可信度截断，仅有的 3 个 MCT 配方被挤出候选池，LLM 根本没机会看到它们。修复（早产画像 MCT 保送 + 提示词量化能量需求）后同题复测 3 分 → 4 分。<strong>评测的价值不只是打分——它让「推荐不好」从一句笼统的抱怨，变成可定位、可修复、可复测的具体问题。</strong></p>
+            <p>六轮迭代，总分 79 → 90 → 89，当前 89 分 · 零 badcase。</p>
+        </div>
+
+        <!-- 04 价值 -->
+        <div class="case-block">
+            <h2><span class="cb-num">04</span>价值衡量</h2>
+            <div class="case-metrics">
+                <div class="case-metric">
+                    <div class="cm-value">8 周</div>
+                    <div class="cm-label">从立项到上线</div>
+                </div>
+                <div class="case-metric">
+                    <div class="cm-value">2.1 万行</div>
+                    <div class="cm-label">全栈代码 · 独立自研</div>
+                </div>
+                <div class="case-metric">
+                    <div class="cm-value">869 → 323</div>
+                    <div class="cm-label">SKU 采集 → 知识图谱</div>
+                </div>
+                <div class="case-metric">
+                    <div class="cm-value">89 分</div>
+                    <div class="cm-label">自建评测 · 零 badcase</div>
+                </div>
+                <div class="case-metric">
+                    <div class="cm-value">已上线</div>
+                    <div class="cm-label">微信小程序「七选」</div>
+                </div>
+            </div>
+            <p>过程中的两次实战止损同样值得记录：一次 P0 生产事故（异步路由同步调用 LLM 无超时导致全站卡死）——修复用线程池隔离 + 超时兜底，教训是「上线不是终点，对关键链路做最坏假设」；一次提审前止损（个人主体不支持 web-view）——提前核查官方文档硬性限制，省下整个返工周期。</p>
+        </div>
+
+        <!-- 05 展示 -->
+        <div class="case-block">
+            <h2><span class="cb-num">05</span>项目展示</h2>
+            <p>微信搜索「七选」即可体验小程序；或打开 H5 版直接试用——问它一个真实的养育问题试试。</p>
+            <div class="case-actions">
+                <a class="primary-cta" href="https://www.sevenpick.com.cn" target="_blank" rel="noreferrer">体验产品（H5）→</a>
+                <a class="ghost-cta" href="../index.html#work">返回项目作品</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <footer>
+        <p>© 2026 张强 · AI 时代的产品 Builder 与翻译官</p>
+        <p><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">京ICP备2026063162号-2</a></p>
+    </footer>
+</body>
+</html>

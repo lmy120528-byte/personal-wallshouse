@@ -13,20 +13,20 @@
     <script defer src="js/gsap.min.js"></script>
     <script defer src="hero-v2.js"></script>
 </head>
-<body>
+<body id="top">
     <!-- 导航栏 -->
     <nav>
         <div class="nav-left">
             <a href="index.html" class="nav-home-link">
-                <img src="images/avatar.png" alt="张强" class="nav-icon">
+                <img src="images/avatar.jpg" alt="张强" class="nav-icon">
                 <span class="nav-brand">Product Builder</span>
             </a>
         </div>
         <div class="nav-right">
             <a href="index.html">首页</a>
+            <a href="#work">项目作品</a>
             <a href="#about">关于</a>
-            <a href="projects.html">项目经历</a>
-            <a href="articles.html">文章</a>
+            <a href="articles.html">思考输出</a>
             <a href="#contact">联系</a>
             <a class="nav-agent-btn" href="javascript:void(0)" id="btnOpenChat">数字分身</a>
         </div>
@@ -38,11 +38,41 @@
         <canvas id="heroBg"></canvas>
         <div class="hero-overlay"></div>
         <div class="hero-content">
+            <p class="hero-kicker">前百度高级产品经理 · GEO 创业者 · 专注 AI 产品设计与 Agent 打造</p>
             <div class="hero-title-wrap">
                 <p class="hero-line hero-line-1">AI 时代的产品</p>
                 <p class="hero-line hero-line-2">Builder 与翻译官</p>
             </div>
             <div class="hero-subtitle" id="heroSubtitle"></div>
+            <!-- 数据成绩单：三个项目各一条硬证据 -->
+            <div class="hero-proof">
+                <div class="hero-proof-item">
+                    <span class="hp-num">01</span>
+                    <div class="hp-text">
+                        <strong>七选 · 宝宝养育助手 Agent</strong>
+                        <span>一个人 8 周独立打造 · 微信小程序已上线</span>
+                    </div>
+                </div>
+                <div class="hero-proof-item">
+                    <span class="hp-num">02</span>
+                    <div class="hp-text">
+                        <strong>GEO 生成式引擎优化</strong>
+                        <span>产品合伙人 · 0→1 打造平台系统与公司业务产品基座</span>
+                    </div>
+                </div>
+                <div class="hero-proof-item">
+                    <span class="hp-num">03</span>
+                    <div class="hp-text">
+                        <strong>日均千万级 GMV · 百度 6 年</strong>
+                        <span>高级产品经理 P6 · 三个 0→1 平台 · 两次晋升</span>
+                    </div>
+                </div>
+            </div>
+            <!-- CTA -->
+            <div class="hero-actions">
+                <a class="primary-cta" href="#work">查看项目 ↓</a>
+                <a class="ghost-cta" href="javascript:void(0)" onclick="document.getElementById('btnOpenChat').click()">和数字分身聊聊</a>
+            </div>
         </div>
         <div class="scroll-indicator">
             <span class="scroll-arrow">↓</span>
@@ -50,12 +80,224 @@
     </section>
 
 
-    <!-- ② 关于 -->
+    <!-- ② 项目作品 -->
+    <section id="work" class="section section-alt">
+        <div class="section-label">WORK</div>
+        <h2>项目作品</h2>
+        <p class="articles-desc" style="max-width:1100px;margin: -28px auto 40px;padding:0 24px;">
+            三组项目：Agent 从 0 到 1 的落地，一场 GEO 创业实践，6 年 B 端平台体系
+        </p>
+
+        <div class="work-list">
+
+            <!-- 01 七选：重点（0→1 经历） -->
+            <div class="work-item">
+                <div class="work-visual visual-journey">
+                    <div class="case-screen">
+                        <div class="case-screen-top">
+                            <span class="cs-dots"><i></i><i></i><i></i></span>
+                            <span class="cs-title">七选 · 0→1 历程（8 周）</span>
+                            <span class="cs-status"><i class="status-dot"></i>已上线</span>
+                        </div>
+                        <div class="journey-map">
+                            <div class="jm-node">
+                                <span class="jm-dot">1</span>
+                                <div class="jm-body">
+                                    <strong>立项</strong>
+                                    <span>宝爸真实痛点：货架上有几百种「好」，却没人回答「我的宝宝适合什么」</span>
+                                </div>
+                            </div>
+                            <div class="jm-node">
+                                <span class="jm-dot">2</span>
+                                <div class="jm-body">
+                                    <strong>需求</strong>
+                                    <span>收敛为一句话：「几轮对话，给我家宝宝一个答案」</span>
+                                </div>
+                            </div>
+                            <div class="jm-node">
+                                <span class="jm-dot">3</span>
+                                <div class="jm-body">
+                                    <strong>设计</strong>
+                                    <span>三层架构定稿：用户画像 → 匹配链接 → 知识图谱</span>
+                                </div>
+                            </div>
+                            <div class="jm-node">
+                                <span class="jm-dot">4</span>
+                                <div class="jm-body">
+                                    <strong>供给侧</strong>
+                                    <span>869 个 SKU 采集 → 323 个可推荐 SKU（14 品牌 / 45 系列）</span>
+                                </div>
+                            </div>
+                            <div class="jm-node">
+                                <span class="jm-dot">5</span>
+                                <div class="jm-body">
+                                    <strong>开发</strong>
+                                    <span>2.1 万行全栈代码：FastAPI + Vue 3 + Graph RAG</span>
+                                </div>
+                            </div>
+                            <div class="jm-node">
+                                <span class="jm-dot">6</span>
+                                <div class="jm-body">
+                                    <strong>评测</strong>
+                                    <span>自建 Eval：30 题 · 六维评分卡 · 89 分 · 零 badcase</span>
+                                </div>
+                            </div>
+                            <div class="jm-node jm-node-final">
+                                <span class="jm-dot">🚀</span>
+                                <div class="jm-body">
+                                    <strong>上线</strong>
+                                    <span>微信小程序「七选」审核通过 · 正式上线</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="visual-caption">▲ 真实里程碑：一个人独立完成 需求 → 设计 → 开发 → 评测 → 上线</p>
+                </div>
+                <div class="work-copy">
+                    <span class="work-num">01</span>
+                    <h3>七选 · 宝宝养育助手 Agent</h3>
+                    <p class="work-role">独立 Product Builder · 2026.06 — 2026.10</p>
+                    <p class="work-pitch">一个人，8 周，从 0 到 1 独立跑通「需求 → 设计 → 开发 → 评测 → 上线」完整闭环。</p>
+                    <p class="work-desc">
+                        从一个宝爸的真实痛点出发：「货架上有几百种『好』，却没人回答我的宝宝适合什么」。独立完成需求调研、三层产品架构设计、869 个 SKU 知识图谱构建、全栈开发，再到自建 Eval 评测体系、通过合规审核上线微信小程序——不是「用 AI 生成一个 demo」，而是有评测背书、经得起真机验收的真实上架产品。
+                    </p>
+                    <div class="work-tags">
+                        <span>0→1 独立闭环</span><span>Agent 设计</span><span>Vibe Coding</span><span>Eval 评测体系</span><span>知识图谱</span>
+                    </div>
+                    <div class="work-stats">
+                        <div class="ws-item"><span class="ws-value">8 周</span><span class="ws-label">从立项到上线</span></div>
+                        <div class="ws-item"><span class="ws-value">2.1 万行</span><span class="ws-label">全栈代码 · 独立自研</span></div>
+                        <div class="ws-item"><span class="ws-value">89 分</span><span class="ws-label">自建评测 · 零 badcase</span></div>
+                        <div class="ws-item"><span class="ws-value">已上线</span><span class="ws-label">微信小程序「七选」</span></div>
+                    </div>
+                    <div class="work-actions">
+                        <a class="primary-cta mini-cta" href="https://www.sevenpick.com.cn" target="_blank" rel="noreferrer">查看项目完整介绍 →</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 02 GEO：次重点 -->
+            <div class="work-item work-item-reverse">
+                <div class="work-visual visual-geo">
+                    <div class="case-screen">
+                        <div class="case-screen-top">
+                            <span class="cs-dots"><i></i><i></i><i></i></span>
+                            <span class="cs-title">AI 搜索 · 引用示意</span>
+                            <span class="cs-status"><i class="status-dot"></i>示意</span>
+                        </div>
+                        <div class="search-mock">
+                            <div class="sm-query">🔍 「预算 2 万，哪家 GEO 服务商靠谱？」</div>
+                            <div class="sm-answer">
+                                综合公开信息，该品牌的内容资产较完整：官网结构化内容覆盖产品与案例，另有 15 篇公开实操文章可交叉验证<sup>1</sup><sup>2</sup>。
+                            </div>
+                            <div class="sm-sources">
+                                <div class="sm-src"><span class="sm-src-idx">1</span> 品牌官网 · 结构化内容与案例</div>
+                                <div class="sm-src"><span class="sm-src-idx">2</span> 行业平台 · 实操文章系列</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="visual-caption">▲ AI 搜索引用示意（非真实结果）——GEO 的目标：让品牌成为 AI 回答里被引用的那个</p>
+                </div>
+                <div class="work-copy">
+                    <span class="work-num">02</span>
+                    <h3>GEO 生成式引擎优化</h3>
+                    <p class="work-role">产品合伙人 · 2026 — 至今</p>
+                    <p class="work-pitch">帮助品牌在 AI 信息世界建立「可被理解、可被推荐的认知体」。</p>
+                    <p class="work-desc">
+                        以产品合伙人参与创业，0→1 打造平台系统与公司业务产品基座。当用户开始向 AI 而不是搜索引擎提问，「被 AI 推荐」成为品牌的新增长入口——我梳理了 GEO 行业四类服务商格局，沉淀「两端一连接」做法框架，并以实操文章持续验证。
+                    </p>
+                    <div class="work-tags">
+                        <span>GEO</span><span>内容策略</span><span>行业研究</span><span>增长</span>
+                    </div>
+                    <div class="work-stats">
+                        <div class="ws-item"><span class="ws-value">0→1</span><span class="ws-label">平台系统与业务产品基座</span></div>
+                        <div class="ws-item"><span class="ws-value">两端一连接</span><span class="ws-label">做法框架</span></div>
+                        <div class="ws-item"><span class="ws-value">15 篇</span><span class="ws-label">GEO 实操文章</span></div>
+                    </div>
+                    <div class="work-actions">
+                        <a class="primary-cta mini-cta" href="cases/geo.html">查看详情</a>
+                        <a class="ghost-cta mini-cta" href="#articles">阅读 GEO 文章</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 03 百度：B 端平台体系（看板仿真） -->
+            <div class="work-item">
+                <div class="work-visual visual-dash">
+                    <div class="case-screen">
+                        <div class="case-screen-top">
+                            <span class="cs-dots"><i></i><i></i><i></i></span>
+                            <span class="cs-title">商家平台 · 经营看板（示意）</span>
+                            <span class="cs-status"><i class="status-dot"></i>持续迭代 6 年</span>
+                        </div>
+                        <div class="dash-body">
+                            <div class="dash-metrics">
+                                <div class="dash-metric">
+                                    <div class="dm-value">千万级</div>
+                                    <div class="dm-label">日均 GMV</div>
+                                </div>
+                                <div class="dash-metric">
+                                    <div class="dm-value">3 万+</div>
+                                    <div class="dm-label">连接线下机构</div>
+                                </div>
+                                <div class="dash-metric">
+                                    <div class="dm-value">亿级</div>
+                                    <div class="dm-label">管理 SKU</div>
+                                </div>
+                            </div>
+                            <div class="dash-progress">
+                                <div class="dp-row">
+                                    <span class="dp-label">商家入驻时效</span>
+                                    <div class="dp-track"><i style="width:96%"></i></div>
+                                    <span class="dp-value">14 天 → 2 小时</span>
+                                </div>
+                                <div class="dp-row">
+                                    <span class="dp-label">高危资质拦截率</span>
+                                    <div class="dp-track"><i style="width:85%"></i></div>
+                                    <span class="dp-value">85%+</span>
+                                </div>
+                                <div class="dp-row">
+                                    <span class="dp-label">经营工具使用率</span>
+                                    <div class="dp-track"><i style="width:80%"></i></div>
+                                    <span class="dp-value">80%+</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="visual-caption">▲ 经营看板 · 结构示意（非真实界面）——「数据看板」本身也是我的交付物之一</p>
+                </div>
+                <div class="work-copy">
+                    <span class="work-num">03</span>
+                    <h3>百度 · 医药电商平台体系</h3>
+                    <p class="work-role">高级产品经理（P6）· 2020 — 2026 · 两次晋升 · 绩效 Top 20%</p>
+                    <p class="work-pitch">三个 0→1 平台，一条完整链路：建生态 → 提效率 → 做商业化。</p>
+                    <p class="work-desc">
+                        6 年主导医药电商与消费医疗关键平台：商家平台从 0 到 1 搭建供给生态，「悟空」CMS 让运营摆脱研发依赖，「望岳」把非标商业合作搬上线——把非标业务抽象成系统，把系统做成收入。支撑日均千万级 GMV 与每季度过亿营收。
+                    </p>
+                    <div class="work-tags">
+                        <span>0→1 架构设计</span><span>复杂业务建模</span><span>商业化闭环</span><span>数据驱动</span>
+                    </div>
+                    <div class="work-stats">
+                        <div class="ws-item"><span class="ws-value">千万级</span><span class="ws-label">日均 GMV</span></div>
+                        <div class="ws-item"><span class="ws-value">14 天→2 小时</span><span class="ws-label">商家入驻时效</span></div>
+                        <div class="ws-item"><span class="ws-value">季度过亿</span><span class="ws-label">「望岳」营收</span></div>
+                        <div class="ws-item"><span class="ws-value">两次晋升</span><span class="ws-label">绩效 Top 20%</span></div>
+                    </div>
+                    <div class="work-actions">
+                        <a class="primary-cta mini-cta" href="cases/baidu.html">查看详情</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ③ 关于 -->
     <section id="about" class="section section-alt">
         <div class="section-label">ABOUT</div>
         <h2>关于我</h2>
         <p class="articles-desc" style="max-width:1100px;margin: -28px auto 32px;padding:0 24px;">
-            前百度高级产品经理（P6），6 年 B 端产品实战经验。现 GEO 行业创业者，专注为品牌构建 AI 时代的"认知体"。<br>
+            8 年传统产品经理，擅长 B 端复杂系统构建（其中百度 6 年 · 高级产品经理 P6）；1 年 AI 产品经理，现以产品合伙人身份参与 GEO 创业，专注为品牌构建 AI 时代的"认知体"。<br>
             擅长从 0 到 1 搭建产品体系，具备完整的产品架构、需求洞察与设计交付能力。正在深入探索 Agent 设计与 Harness 工程在商业场景中的落地。
         </p>
 
@@ -133,12 +375,46 @@
                 </div>
             </div>
         </div>
+
+        <div class="ai-day">
+            <div class="case-screen">
+                <div class="case-screen-top">
+                    <span class="cs-dots"><i></i><i></i><i></i></span>
+                    <span class="cs-title">我的 AI 一天 · 全天候 Agent 使用者</span>
+                    <span class="cs-status"><i class="status-dot"></i>重度使用</span>
+                </div>
+                <div class="ai-day-body">
+                    <div class="ad-zone">
+                        <span class="ad-icon">☀️</span>
+                        <div class="ad-copy">
+                            <strong>白天 · 工作助理</strong>
+                            <span>内容生成优化与日常工作协助——Agent 替我扛琐碎，我把时间留给判断</span>
+                        </div>
+                    </div>
+                    <div class="ad-zone">
+                        <span class="ad-icon">🌙</span>
+                        <div class="ad-copy">
+                            <strong>晚上 · 个人产品与成长</strong>
+                            <span>业余时间开发个人产品（七选、数字分身），学习、日常生活建议与决策建议，全靠这些 Agent</span>
+                        </div>
+                    </div>
+                    <div class="tool-chips">
+                        <span class="tool-chip">OpenClaw<em>公司内容生成优化</em></span>
+                        <span class="tool-chip">Claude Code<em>个人产品开发主力 · 七选 2.1 万行</em></span>
+                        <span class="tool-chip">DeepSeek Harness<em>七选与数字分身底座</em></span>
+                        <span class="tool-chip">Codex<em>多 Agent 开发</em></span>
+                        <span class="tool-chip">Hermes Agent<em>Agent 深度体验</em></span>
+                    </div>
+                </div>
+            </div>
+            <p class="visual-caption">对 Agent 的判断，不来自报告，来自每天的亲手使用。</p>
+        </div>
     </section>
 
-    <!-- ③ 文章 -->
+    <!-- ④ 思考输出 -->
     <section id="articles" class="section section-alt">
-        <div class="section-label">ARTICLES</div>
-        <h2>文章</h2>
+        <div class="section-label">THINKING</div>
+        <h2>思考输出</h2>
         <p class="articles-desc">写作即思考——每一篇都是 GEO 实操与 AI 认知的沉淀</p>
 
         <!-- Tab 切换 -->
@@ -156,153 +432,56 @@
         </div>
     </section>
 
-    <!-- ④ 项目经历 -->
-    <section id="experience" class="section section-alt">
-        <div class="section-label">EXPERIENCE</div>
-        <h2>项目经历</h2>
-
-        <div class="timeline">
-
-            <!-- GEO 创业 -->
-            <div class="tl-item">
-                <div class="tl-marker">
-                    <span class="tl-time">2026 - 至今</span>
-                    <div class="tl-dot active"></div>
-                </div>
-                <div class="tl-body">
-                    <div class="company-block">
-                        <div class="company-header">
-                            <div class="company-logo geo-logo">GEO</div>
-                            <div class="company-info">
-                                <h3 class="company-name">GEO 创业</h3>
-                                <p class="company-role">产品负责人</p>
-                            </div>
-                        </div>
-                        <div class="company-tags">
-                            <span>Vibe Coding</span><span>Agent 设计</span><span>Harness 设计</span><span>LLM</span>
-                        </div>
-                    </div>
-
-                    <div class="projects-block">
-                        <div class="project-cards">
-                            <div class="project-card">
-                                <div class="project-content">
-                                    <h4 class="project-title">业务模式构建</h4>
-                                    <p class="project-desc">从 0 到 1 搭建 GEO 业务模式，探索 AI 在内容生成与搜索优化中的落地路径。占位描述，后续补充具体成果和数据。</p>
-                                </div>
-                                <div class="project-img">
-                                    <div class="img-placeholder"><span>业务模式构建</span></div>
-                                    <div class="project-stats">
-                                        <div class="stat-item"><span class="stat-value">占位</span><span class="stat-label">数据指标</span></div>
-                                        <div class="stat-item"><span class="stat-value">占位</span><span class="stat-label">数据指标</span></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="project-card">
-                                <div class="project-content">
-                                    <h4 class="project-title">SaaS 产品负责人</h4>
-                                    <p class="project-desc">负责 SaaS 产品整体设计，涵盖用户需求分析、功能规划与迭代。占位描述，后续补充具体成果和数据。</p>
-                                </div>
-                                <div class="project-img">
-                                    <div class="img-placeholder"><span>SaaS 产品</span></div>
-                                    <div class="project-stats">
-                                        <div class="stat-item"><span class="stat-value">占位</span><span class="stat-label">数据指标</span></div>
-                                        <div class="stat-item"><span class="stat-value">占位</span><span class="stat-label">数据指标</span></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 百度 -->
-            <div class="tl-item">
-                <div class="tl-marker">
-                    <span class="tl-time">2020 - 2026</span>
-                    <div class="tl-dot"></div>
-                </div>
-                <div class="tl-body">
-                    <div class="company-block">
-                        <div class="company-header">
-                            <div class="company-logo baidu-logo">B</div>
-                            <div class="company-info">
-                                <h3 class="company-name">百度</h3>
-                                <p class="company-role">高级产品经理 · 职级 P6</p>
-                            </div>
-                        </div>
-                        <div class="company-tags">
-                            <span>用户研究</span><span>B端产品</span><span>数据分析</span><span>产品设计</span><span>业务负责人</span>
-                        </div>
-                    </div>
-
-                    <div class="projects-block">
-                        <div class="project-cards">
-                            <div class="project-card">
-                                <div class="project-content">
-                                    <h4 class="project-title">医药电商商家平台</h4>
-                                    <p class="project-desc">面向医药电商行业的 B 端商家管理平台。占位描述，后续补充具体成果和数据。</p>
-                                </div>
-                                <div class="project-img">
-                                    <div class="img-placeholder"><span>医药电商商家平台</span></div>
-                                    <div class="project-stats">
-                                        <div class="stat-item"><span class="stat-value">占位</span><span class="stat-label">数据指标</span></div>
-                                        <div class="stat-item"><span class="stat-value">占位</span><span class="stat-label">数据指标</span></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="project-card">
-                                <div class="project-content">
-                                    <h4 class="project-title">「悟空」CMS 配置平台</h4>
-                                    <p class="project-desc">内容管理配置平台。占位描述，后续补充具体成果和数据。</p>
-                                </div>
-                                <div class="project-img">
-                                    <div class="img-placeholder"><span>悟空 CMS</span></div>
-                                    <div class="project-stats">
-                                        <div class="stat-item"><span class="stat-value">占位</span><span class="stat-label">数据指标</span></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="project-card">
-                                <div class="project-content">
-                                    <h4 class="project-title">「望岳」商业管理中心</h4>
-                                    <p class="project-desc">商业数据管理平台。占位描述，后续补充具体成果和数据。</p>
-                                </div>
-                                <div class="project-img">
-                                    <div class="img-placeholder"><span>望岳商业管理中心</span></div>
-                                    <div class="project-stats">
-                                        <div class="stat-item"><span class="stat-value">占位</span><span class="stat-label">数据指标</span></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 查看更多 -->
-            <div class="tl-item tl-more">
-                <div class="tl-marker">
-                    <div class="tl-dot more"></div>
-                </div>
-                <div class="tl-body">
-                    <a href="projects.html" class="tl-view-more">
-                        查看更多 →
-                    </a>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
     <!-- ⑤ 联系 -->
     <section id="contact" class="section section-alt">
         <div class="section-label">CONTACT</div>
-        <h2>联系我</h2>
-        <p>邮箱：<a href="mailto:275029558@qq.com">275029558@qq.com</a></p>
+        <h2>开放求职状态</h2>
+        <p class="articles-desc" style="max-width:1100px;margin: -28px auto 36px;padding:0 24px;">
+            目标方向：平台型 / 商业化方向资深 B 端产品经理 · 以及 AI 应用与 Agent 产品经理<br>
+            📮 275029558@qq.com
+        </p>
+
+        <div class="intent-strip">
+            <div class="intent-item">
+                <span class="intent-label">求职方向</span>
+                <strong>资深 B 端产品经理</strong>
+                <span class="intent-sub">平台型 / 商业化 · 开放 AI 应用与 Agent 机会</span>
+            </div>
+            <div class="intent-item">
+                <span class="intent-label">经验背书</span>
+                <strong>8 年 B 端 · 百度 P6</strong>
+                <span class="intent-sub">日均千万级 GMV 平台 · 两次晋升</span>
+            </div>
+            <div class="intent-item">
+                <span class="intent-label">期望城市</span>
+                <strong>北京</strong>
+                <span class="intent-sub">8 年经验均在北京</span>
+            </div>
+            <div class="intent-item">
+                <span class="intent-label">当前状态</span>
+                <strong>在职 · 开放机会</strong>
+                <span class="intent-sub">随时可以聊</span>
+            </div>
+        </div>
+
+        <div class="contact-grid">
+            <div class="contact-card">
+                <h3>📮 直接联系</h3>
+                <p>欢迎邮件沟通，我会在 24 小时内回复</p>
+                <a class="primary-cta mini-cta" href="mailto:275029558@qq.com">发送邮件 →</a>
+            </div>
+            <div class="contact-card">
+                <h3>💬 先聊一聊</h3>
+                <p>不确定是否匹配？先和我的数字分身聊聊，它会如实介绍我的经历和优势</p>
+                <a class="ghost-cta mini-cta" href="javascript:void(0)" onclick="document.getElementById('btnOpenChat').click()">打开数字分身</a>
+            </div>
+            <div class="contact-card">
+                <h3>📱 关注公众号</h3>
+                <p>「白话 AI」持续输出 GEO 与 AI 产品思考</p>
+                <img src="images/维系公众号二维码.jpg" alt="公众号二维码" class="contact-qr" loading="lazy">
+            </div>
+        </div>
+        <p class="back-top"><a class="ghost-cta" href="#top">回到顶部 ↑</a></p>
     </section>
 
     <!-- 底部 -->
@@ -316,7 +495,7 @@
         const tags = [
             '前百度高级产品经理',
             'ToB 业务线负责人',
-            'GEO 增长架构师',
+            'GEO 产品合伙人',
             '白话 AI 创作者',
             '产品思维实践者'
         ];
@@ -361,25 +540,7 @@
         setTimeout(typeWriter, 1600);
     </script>
     <script>
-        // 时间轴圆点：检测当前滚动到哪家公司，高亮对应圆点
-        (function () {
-            const items = document.querySelectorAll('.tl-item:not(.tl-more)');
-            const dots = document.querySelectorAll('.tl-dot:not(.more)');
-
-            function update() {
-                let activeIdx = -1;
-                for (let i = items.length - 1; i >= 0; i--) {
-                    if (items[i].getBoundingClientRect().top <= 130) {
-                        activeIdx = i;
-                        break;
-                    }
-                }
-                dots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
-            }
-
-            window.addEventListener('scroll', update, { passive: true });
-            update();
-        })();
+        // 时间轴高亮脚本已随旧版时间轴移除（2026-10-18 改版为作品集布局）
     </script>
     <script src="articles-data.js"></script>
     <script>
@@ -476,11 +637,11 @@
                 <div class="msg-avatar">强</div>
                 <div>
                     <div class="msg-bubble">
-                        你好，我是张强的数字分身。<br><br>
-                        你可以直接问我任何问题：<br>
-                        • "你怎么看 GEO 的未来？"<br>
-                        • "讲讲你在百度做过的项目"<br>
-                        • "RAG 技术是什么？有什么缺陷？"
+                        你好，我是张强的数字分身，可以随时问我关于他的任何问题：<br><br>
+                        • "七选（宝宝养育助手）是怎么从 0 到 1 做出来的？"<br>
+                        • "他做 GEO 有哪些实践和思考？"<br>
+                        • "他在百度做过什么？擅长什么？"<br>
+                        • 或者直接问："他适合我们团队吗？"
                     </div>
                 </div>
             </div>
@@ -568,11 +729,11 @@
                 el.className = 'msg agent';
                 el.innerHTML = '<div class="msg-avatar">强</div>' +
                     '<div><div class="msg-bubble">' +
-                    '你好，我是张强的数字分身。<br><br>' +
-                    '你可以直接问我任何问题：<br>' +
-                    '• "你怎么看 GEO 的未来？"<br>' +
-                    '• "讲讲你在百度做过的项目"<br>' +
-                    '• "RAG 技术是什么？有什么缺陷？"' +
+                    '你好，我是张强的数字分身，可以随时问我关于他的任何问题：<br><br>' +
+                    '• "七选（宝宝养育助手）是怎么从 0 到 1 做出来的？"<br>' +
+                    '• "他做 GEO 有哪些实践和思考？"<br>' +
+                    '• "他在百度做过什么？擅长什么？"<br>' +
+                    '• 或者直接问："他适合我们团队吗？"' +
                     '</div></div>';
                 messages.appendChild(el);
             }
