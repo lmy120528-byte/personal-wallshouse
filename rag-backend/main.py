@@ -18,6 +18,12 @@ import urllib.request
 import urllib.error
 from datetime import datetime
 from urllib.parse import urlparse
+
+# 强制离线加载 Embedding 模型（2026-10-18）：
+# 模型懒加载时会先联网检查 hf-mirror.com，服务器出网不稳时提问会卡死几分钟。
+# 模型已缓存在本地，离线模式直接读缓存，摆脱网络依赖。
+os.environ.setdefault("HF_HUB_OFFLINE", "1")
+
 from retriever import Retriever
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
