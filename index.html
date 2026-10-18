@@ -813,13 +813,16 @@
                 // 创建空的 agent 消息气泡（用于逐字填充）
                 var agentEl = createStreamBubble();
                 var bubbleEl = agentEl.querySelector('.msg-bubble');
+                var reasoningBox = agentEl.querySelector('.msg-reasoning');
+                var reasoningContent = agentEl.querySelector('.msg-reasoning-content');
+                var sources = [];
 
-                // 显示「思考中」loading（思考过程与参考资料不下发，只等正式回答）
-                bubbleEl.innerHTML = '💭 思考中 <span class="dot"></span><span class="dot"></span><span class="dot"></span>';
+                // 显示 loading 动效（三个跳动点）
+                bubbleEl.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
                 agentEl.classList.add('thinking');
                 scrollChat();
 
-                // 标记：首个回答内容到达时移除 loading
+                // 标记：首次收到数据时移除 loading
                 var firstChunk = true;
 
                 // 禁用输入
@@ -835,22 +838,42 @@
                 .then(function(resp) {
                     if (!resp.ok) throw new Error('HTTP ' + resp.status);
                     return streamResponse(resp, function(chunk, type) {
-                        if (type !== 'content') return;
-                        // 首个回答内容到达：清除「思考中」loading
+                        // 首次收到数据：清除 loading 动画
                         if (firstChunk) {
                             firstChunk = false;
                             agentEl.classList.remove('thinking');
                             bubbleEl.innerHTML = '';
                         }
-                        // 逐字追加到气泡
-                        bubbleEl.innerHTML += chunk
-                            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-                            .replace(/\n\n/g, '<br><br>')
-                            .replace(/\n/g, '<br>');
-                        scrollChat();
+                        if (type === 'content') {
+                            // 逐字追加到气泡
+                            bubbleEl.innerHTML += chunk
+                                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                                .replace(/\n\n/g, '<br><br>')
+                                .replace(/\n/g, '<br>');
+                            scrollChat();
+                        } else if (type === 'reasoning') {
+                            // 追加到思考过程，首次自动展开让用户看到活动
+                            reasoningBox.style.display = 'block';
+                            if (!reasoningBox.classList.contains('was-expanded')) {
+                                reasoningBox.classList.add('expanded', 'was-expanded');
+                                reasoningBox.querySelector('.reasoning-arrow').textContent = '▾';
+                            }
+                            reasoningContent.innerHTML += chunk
+                                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                                .replace(/\n/g, '<br>');
+                            scrollChat();
+                        } else if (type === 'sources') {
+                            sources = chunk;
+                        }
                     });
                 })
                 .then(function(fullText) {
+                    // 流结束，添加来源
+                    if (sources.length > 0) {
+                        var srcHtml = '<div class="msg-sources">参考 ' +
+                            sources.map(function(s) { return '<span class="src-chip">' + s + '</span>'; }).join('') + '</div>';
+                        agentEl.querySelector('.msg-body').insertAdjacentHTML('beforeend', srcHtml);
+                    }
                     sendBtn.disabled = false;
                     input.disabled = false;
                     input.focus();
@@ -897,13 +920,17 @@
                                 if (obj.type === 'content') {
                                     fullText += obj.content;
                                     onChunk(obj.content, 'content');
+                                } else if (obj.type === 'reasoning') {
+                                    // 思考过程：交给回调显示（首次会自动触发 clearLoading）
+                                    onChunk(obj.content, 'reasoning');
+                                } else if (obj.type === 'sources') {
+                                    onChunk(obj.sources, 'sources');
                                 } else if (obj.type === 'error') {
                                     throw new Error(obj.error);
                                 } else if (obj.error) {
                                     // 兜底：兼容 {"error": "..."} 格式
                                     throw new Error(obj.error);
                                 }
-                                // reasoning / sources 等事件静默忽略（后端已不下发）
                             } catch(e) {
                                 if (e.message && e.message.indexOf('SyntaxError') === -1) throw e;
                             }
@@ -920,10 +947,21 @@
                 el.className = 'msg agent';
                 el.innerHTML = '<div class="msg-avatar">强</div>' +
                     '<div class="msg-body">' +
+                    '<div class="msg-reasoning" style="display:none;">' +
+                    '<div class="msg-reasoning-header" onclick="toggleReasoning(this)">💭 思考过程 <span class="reasoning-arrow">▸</span></div>' +
+                    '<div class="msg-reasoning-content"></div>' +
+                    '</div>' +
                     '<div class="msg-bubble" style="min-height:20px;"></div></div>';
                 messages.appendChild(el);
                 return el;
             }
+
+            window.toggleReasoning = function(header) {
+                var box = header.parentElement;
+                box.classList.toggle('expanded');
+                var arrow = header.querySelector('.reasoning-arrow');
+                arrow.textContent = box.classList.contains('expanded') ? '▾' : '▸';
+            };
 
             // ---- 消息渲染 ----
             function appendMsg(role, text, sources, isRestore) {
@@ -935,10 +973,25 @@
                     .replace(/\n\n/g, '</p><p>')
                     .replace(/\n/g, '<br>');
                 html = '<p>' + html + '</p>';
+                var srcHtml = '';
+                if (sources && sources.length > 0) {
+                    srcHtml = '<div class="msg-sources">参考 ' +
+                        sources.map(function(s) { return '<span class="src-chip">' + s + '</span>'; }).join('') + '</div>';
+                }
                 el.innerHTML = '<div class="msg-avatar">' + avatar + '</div>' +
-                    '<div class="msg-body"><div class="msg-bubble">' + html + '</div></div>';
+                    '<div class="msg-body"><div class="msg-bubble">' + html + '</div>' + srcHtml + '</div>';
                 messages.appendChild(el);
                 if (!isRestore) scrollChat();
+            }
+
+            function appendThinking() {
+                var el = document.createElement('div');
+                el.className = 'msg agent thinking';
+                el.innerHTML = '<div class="msg-avatar">强</div>' +
+                    '<div class="msg-bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
+                messages.appendChild(el);
+                scrollChat();
+                return el;
             }
 
             function scrollChat() {

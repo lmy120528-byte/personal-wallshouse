@@ -299,7 +299,10 @@ def stream_deepseek(messages, api_key):
             try:
                 obj = json.loads(data)
                 delta = obj["choices"][0].get("delta", {})
-                # 思考链内容不下发：前端只展示「思考中」loading（2026-10-18 需求）
+                # 推理过程（思考链）
+                reasoning = delta.get("reasoning_content", "")
+                if reasoning:
+                    yield ("reasoning", reasoning)
                 # 最终回答
                 content = delta.get("content", "")
                 if content:
@@ -376,7 +379,8 @@ def chat_stream(req: ChatRequest, request: Request):
     def generate():
         full_answer = ""
 
-        # 参考资料不下发（2026-10-18 需求），sources 仅用于内部日志
+        # 先发送来源信息
+        yield f"data: {json.dumps({'type': 'sources', 'sources': sources}, ensure_ascii=False)}\n\n"
 
         try:
             for chunk_type, chunk_text in stream_deepseek(messages, DEEPSEEK_KEY):
