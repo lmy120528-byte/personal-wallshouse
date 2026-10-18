@@ -177,7 +177,8 @@ def generate_answer(question: str, knowledge: list, history: list, api_key: str)
         "model": "deepseek-v4-pro",
         "messages": messages,
         "temperature": 0.5,
-        "max_tokens": 1200,
+        # 思考链（thinking）也占用 max_tokens 额度，1200 会导致长回答被中途截断，提到 4096
+        "max_tokens": 4096,
         "thinking": {"type": "enabled"},
         "reasoning_effort": "high",
     }
@@ -261,7 +262,8 @@ def stream_deepseek(messages, api_key):
         "model": "deepseek-v4-pro",
         "messages": messages,
         "temperature": 0.5,
-        "max_tokens": 1200,
+        # 思考链也占额度：1200 会截断长回答（2026-10-18 线上「你的优势是什么」被砍断），提到 4096
+        "max_tokens": 4096,
         "stream": True,
         "thinking": {"type": "enabled"},
         "reasoning_effort": "high",
@@ -291,10 +293,7 @@ def stream_deepseek(messages, api_key):
             try:
                 obj = json.loads(data)
                 delta = obj["choices"][0].get("delta", {})
-                # 推理过程（思考链）
-                reasoning = delta.get("reasoning_content", "")
-                if reasoning:
-                    yield ("reasoning", reasoning)
+                # 思考链内容不下发：前端只展示「思考中」loading（2026-10-18 需求）
                 # 最终回答
                 content = delta.get("content", "")
                 if content:
@@ -371,8 +370,7 @@ def chat_stream(req: ChatRequest, request: Request):
     def generate():
         full_answer = ""
 
-        # 先发送来源信息
-        yield f"data: {json.dumps({'type': 'sources', 'sources': sources}, ensure_ascii=False)}\n\n"
+        # 参考资料不下发（2026-10-18 需求），sources 仅用于内部日志
 
         try:
             for chunk_type, chunk_text in stream_deepseek(messages, DEEPSEEK_KEY):
