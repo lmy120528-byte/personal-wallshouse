@@ -5,6 +5,7 @@
       <stop offset="1" stop-color="#8b5cf6"/>
     </linearGradient>
   </defs>
-  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#g)" stroke="#5eead4" stroke-width="3"/>
-  <text x="32" y="42" text-anchor="middle" font-family="-apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif" font-size="36" font-weight="700" fill="#ffffff">七</text>
+  <!-- 页签图标按 16px 最终尺寸设计：无描边（缩小时会糊）、字放大到 48/64 撑满画布 -->
+  <rect width="64" height="64" rx="14" fill="url(#g)"/>
+  <text x="32" y="49.5" text-anchor="middle" font-family="-apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif" font-size="50" font-weight="800" fill="#ffffff">七</text>
 </svg>
